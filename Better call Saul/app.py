@@ -25,8 +25,8 @@ def apply_styles_to_paragraph(paragraph):
         font.size = Pt(DEFAULT_FONT_SIZE)
         font.color.rgb = DEFAULT_FONT_COLOR
 
-@app.route('/generate_d', methods=['POST'])
-def generate_docx_document():
+@app.route('/generate_d/<name_of_doc>', methods=['POST'])
+def generate_docx_document(name_of_doc):
     try:
         # Получаем данные из запроса
         data = request.json
@@ -34,7 +34,7 @@ def generate_docx_document():
             return jsonify({"error": "No data provided"}), 400
 
         # Указываем путь к шаблону
-        template_path = os.path.join('templates', 'form1.docx')
+        template_path = os.path.join('templates', name_of_doc)
         if not os.path.exists(template_path):
             return jsonify({"error": f"Template file not found: {template_path}"}), 404
 
@@ -62,8 +62,8 @@ def generate_docx_document():
         app.logger.error(traceback.format_exc())
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
     
-@app.route('/generate_p', methods=['POST'])
-def generate_pdf_document():
+@app.route('/generate_p/<name_of_doc>', methods=['POST'])
+def generate_pdf_document(name_of_doc):
     try:
         # Получаем данные из запроса
         data = request.json
@@ -71,7 +71,7 @@ def generate_pdf_document():
             return jsonify({"error": "No data provided"}), 400
 
         # Указываем путь к шаблону
-        template_path = os.path.join('templates', 'form1.docx')
+        template_path = os.path.join('templates', name_of_doc)
         if not os.path.exists(template_path):
             return jsonify({"error": f"Template file not found: {template_path}"}), 404
 
