@@ -8,7 +8,7 @@ from docx2pdf import convert
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "https://bettercallsaul-ring.onrender.com"}})
+CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5500"}})
 
 DEFAULT_FONT_NAME = "Times New Roman"
 DEFAULT_FONT_SIZE = 12  # Размер шрифта
@@ -113,4 +113,4 @@ def generate_preview():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, threaded=False)
+    app.run(debug=True,port=5500, threaded=False)
