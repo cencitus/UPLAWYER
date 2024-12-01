@@ -279,12 +279,56 @@ document.addEventListener("click", async (event) => {
 
         // Собираем данные из формы
         const form = event.target.closest("form"); // Находим текущую форму
+
+        const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
+        if (!allFieldsFilled) {
+            alert("Пожалуйста, заполните все поля формы.");
+            return;
+        }
+
         const formData = {};
 
         // Проходимся по всем элементам формы и собираем данные
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim(); // Используем id как ключи для данных
         });
+
+        if (formData.FIO_boss) {
+            const fio = formData.FIO;
+            if (!fio || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.FIO_boss) {
+            const fio_boss = formData.FIO_boss;
+            if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.FIO_dir) {
+            const fio_dir = formData.FIO_dir;
+            if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.name_of_seller) {
+            const fio_seller = formData.name_of_seller;
+            if (!fio_seller || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_seller)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.name_of_buyer) {
+            const fio_buyer = formData.name_of_buyer;
+            if (!fio_buyer || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_buyer)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
             const fullName = formData.name_of_seller;
@@ -454,7 +498,10 @@ document.addEventListener("click", async (event) => {
                 console.error("Ошибка генерации документа:", error.message);
                 alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
             }
-        }else if(selectedTemplate == 'Распоряжение'){
+        }
+        
+        else if(selectedTemplate == 'Распоряжение'){
+
             if (formData.date_task) {
                 const [year, month, day] = formData.date_task.split("-");
                 formData.day_task = day;
@@ -527,12 +574,55 @@ document.addEventListener("click", async (event) => {
 
         // Собираем данные из формы
         const form = event.target.closest("form"); // Находим текущую форму
+
+        const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
+        if (!allFieldsFilled) {
+            alert("Пожалуйста, заполните все поля формы.");
+            return;
+        }
+
         const formData = {};
 
         // Проходимся по всем элементам формы и собираем данные
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim(); // Используем id как ключи для данных
         });
+
+        if (formData.FIO_boss) {
+            const fio = formData.FIO;
+            if (!fio || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.FIO_boss) {
+            const fio_boss = formData.FIO_boss;
+            if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.FIO_dir) {
+            const fio_dir = formData.FIO_dir;
+            if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.name_of_seller) {
+            const fio_seller = formData.name_of_seller;
+            if (!fio_seller || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_seller)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.name_of_buyer) {
+            const fio_buyer = formData.name_of_buyer;
+            if (!fio_buyer || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_buyer)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
 
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
@@ -777,11 +867,57 @@ document.addEventListener("click", async (event) => {
 
         // Собираем данные из формы
         const form = event.target.closest("form");
+
+        const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
+        if (!allFieldsFilled) {
+            alert("Пожалуйста, заполните все поля формы.");
+            return;
+        }
+
         const formData = {};
 
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim();
         });
+
+
+        if (formData.FIO_boss) {
+            const fio = formData.FIO;
+            if (!fio || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.FIO_boss) {
+            const fio_boss = formData.FIO_boss;
+            if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.FIO_dir) {
+            const fio_dir = formData.FIO_dir;
+            if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.name_of_seller) {
+            const fio_seller = formData.name_of_seller;
+            if (!fio_seller || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_seller)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.name_of_buyer) {
+            const fio_buyer = formData.name_of_buyer;
+            if (!fio_buyer || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_buyer)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+
+
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
             const fullName = formData.name_of_seller;
@@ -857,7 +993,7 @@ document.addEventListener("click", async (event) => {
                 const pdfIframe = document.createElement('iframe');
                 pdfIframe.src = pdfUrl;
                 pdfIframe.width = '100%';
-                pdfIframe.height = '500px';
+                pdfIframe.height = '600px';
                 pdfIframe.style.border = 'none';
     
                 previewSector.appendChild(pdfIframe);
@@ -955,7 +1091,7 @@ document.addEventListener("click", async (event) => {
                 const pdfIframe = document.createElement('iframe');
                 pdfIframe.src = pdfUrl;
                 pdfIframe.width = '100%';
-                pdfIframe.height = '500px';
+                pdfIframe.height = '600px';
                 pdfIframe.style.border = 'none';
     
                 previewSector.appendChild(pdfIframe);
@@ -1020,7 +1156,7 @@ document.addEventListener("click", async (event) => {
                 const pdfIframe = document.createElement('iframe');
                 pdfIframe.src = pdfUrl;
                 pdfIframe.width = '100%';
-                pdfIframe.height = '500px';
+                pdfIframe.height = '600px';
                 pdfIframe.style.border = 'none';
     
                 previewSector.appendChild(pdfIframe);
@@ -1030,6 +1166,5 @@ document.addEventListener("click", async (event) => {
                 alert("Произошла ошибка при генерации документа.");
             }
         }
-        
     }
 });
