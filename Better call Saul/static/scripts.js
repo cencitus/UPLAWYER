@@ -198,6 +198,7 @@ const documentFields = {
         { label: 'Количество дней для передачи товара', type: 'text', id: 'count_day' },
     ],
     'Приказ о начале разработки' : [
+        {label: 'Номер приказа', type: 'text', id: 'number_of_order' },
         {label: 'Название организации', type: 'text', id: 'name_of_organization' },
         { label: 'ОГРН', type: 'text', id: 'OGRN' },
         { label: 'ИНН', type: 'text', id: 'INN' },
@@ -220,6 +221,18 @@ const documentFields = {
         { label: 'Должность руководителя организации', type: 'text', id: 'post_boss' },
         { label: 'ФИО руководителя организации', type: 'text', id: 'FIO_boss' },
         { label: 'Документ, на основании которого действует руководитель', type: 'text', id: 'document' },
+    ],
+    'Распоряжение': [
+        { label: 'Название организации', type: 'text', id: 'name_of_organization' },
+        {label: 'Номер распоряжения', type: 'text', id: 'number_of_order' },
+        { label: 'Номер рекламной стратегии', type: 'text', id: 'num_of_task' },
+        { label: 'Дата рекламной стратегии', type: 'date', id: 'date_start' },
+        { label: 'Дата распоряжения', type: 'date', id: 'date' },
+        { label: 'Город', type: 'text', id: 'city' },
+        { label: 'ФИО маркетолога', type: 'text', id: 'FIO' },
+        { label: 'Дата завершения', type: 'date', id: 'date_task' },
+        { label: 'Должность отдавшего распоряжение', type: 'text', id: 'post_boss' },
+        { label: 'ФИО отдавшего распоряжение', type: 'text', id: 'FIO_boss' },
     ]
 };
 
@@ -361,7 +374,7 @@ document.addEventListener("click", async (event) => {
                 return;
             }
             if (formData.date_of_TD) {
-                const [year, month, day] = formData.date.split("-");
+                const [year, month, day] = formData.date_of_TD.split("-");
                 formData.day_of_TD = day;
                 formData.month_of_TD = month;
                 formData.year_of_TD = year.slice(-1);
@@ -370,7 +383,7 @@ document.addEventListener("click", async (event) => {
                 return;
             }
             if (formData.term_date) {
-                const [year, month, day] = formData.date.split("-");
+                const [year, month, day] = formData.term_date.split("-");
                 formData.term_day = day;
                 formData.term_month = month;
                 formData.term_year = year;
@@ -379,22 +392,17 @@ document.addEventListener("click", async (event) => {
                 return;
             }
             if (formData.date_task) {
-                const [year, month, day] = formData.date.split("-");
+                const [year, month, day] = formData.date_task.split("-");
                 formData.day_task = day;
                 formData.month_task = month;
-                formData.year_task = year.slice(-1);
+                formData.year_task = year;
             } else {
                 alert("Пожалуйста, заполните поле даты.");
                 return;
             }
-            if (formData.count_of_day) {
-                const number = Number(formData.count_of_day);
-                if (!isNaN(number)) {
-                    formData.count_of_string_s = numToWords.convert(number);
-                }
-            }
-            if (FIO) {
-                const buyerNameParts = FIO.split(' ');
+            const fullName_b = formData.FIO;
+            if (fullName_b) {
+                const buyerNameParts = fullName_b.split(' ');
                 if (buyerNameParts.length === 3) {
                     // Если имя состоит из Фамилия Имя Отчество
                     formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
@@ -403,8 +411,10 @@ document.addEventListener("click", async (event) => {
                     formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
                 }
             }
-            if (FIO_dir) {
-                const buyerNameParts = FIO_dir.split(' ');
+            formData.FIO = fullName_b;
+            const fullName_a = formData.FIO_dir;
+            if (fullName_b) {
+                const buyerNameParts = fullName_b.split(' ');
                 if (buyerNameParts.length === 3) {
                     // Если имя состоит из Фамилия Имя Отчество
                     formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
@@ -413,9 +423,69 @@ document.addEventListener("click", async (event) => {
                     formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
                 }
             }
+            formData.FIO_dir = fullName_a;
             try {
                 // Отправляем POST-запрос
                 const response = await fetch(`${BASE_URL}/generate_d/order.docx`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                // Проверяем ответ сервера
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
+                }
+
+                // Получаем сгенерированный файл
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'generated_document.docx'; // Название сохраняемого файла
+                a.click();
+
+                // Очищаем временный URL
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+            } catch (error) {
+                console.error("Ошибка генерации документа:", error.message);
+                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
+            }
+        }else if(selectedTemplate == 'Распоряжение'){
+            if (formData.date_task) {
+                const [year, month, day] = formData.date_task.split("-");
+                formData.day_task = day;
+                formData.month_task = month;
+                formData.year_task = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date_start) {
+                const [year, month, day] = formData.date_start.split("-");
+                formData.day_strat = day;
+                formData.month_strat = month;
+                formData.year_strat = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day = day;
+                formData.month = month;
+                formData.year = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            
+            try {
+                // Отправляем POST-запрос
+                const response = await fetch(`${BASE_URL}/generate_d/rasporyajenie.docx`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -542,6 +612,66 @@ document.addEventListener("click", async (event) => {
             alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
         }
         } else if(selectedTemplate == 'Приказ о начале разработки'){
+            if (formData.date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day = day;
+                formData.month = month;
+                formData.year = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date_of_TD) {
+                const [year, month, day] = formData.date_of_TD.split("-");
+                formData.day_of_TD = day;
+                formData.month_of_TD = month;
+                formData.year_of_TD = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.term_date) {
+                const [year, month, day] = formData.term_date.split("-");
+                formData.term_day = day;
+                formData.term_month = month;
+                formData.term_year = year;
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date_task) {
+                const [year, month, day] = formData.date_task.split("-");
+                formData.day_task = day;
+                formData.month_task = month;
+                formData.year_task = year;
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            const fullName_b = formData.FIO;
+            if (fullName_b) {
+                const buyerNameParts = fullName_b.split(' ');
+                if (buyerNameParts.length === 3) {
+                    // Если имя состоит из Фамилия Имя Отчество
+                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
+                } else if (buyerNameParts.length === 2) {
+                    // Если имя состоит из Фамилия Имя
+                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
+                }
+            }
+            formData.FIO = fullName_b;
+            const fullName_a = formData.FIO_dir;
+            if (fullName_b) {
+                const buyerNameParts = fullName_b.split(' ');
+                if (buyerNameParts.length === 3) {
+                    // Если имя состоит из Фамилия Имя Отчество
+                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
+                } else if (buyerNameParts.length === 2) {
+                    // Если имя состоит из Фамилия Имя
+                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
+                }
+            }
+            formData.FIO_dir = fullName_a;
             try {
                 // Отправляем POST-запрос
                 const response = await fetch(`${BASE_URL}/generate_p/order.docx`, {
@@ -572,7 +702,67 @@ document.addEventListener("click", async (event) => {
                 console.error("Ошибка генерации документа:", error.message);
                 alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
             }
+        }else if(selectedTemplate == 'Распоряжение'){
+            if (formData.date_task) {
+                const [year, month, day] = formData.date_task.split("-");
+                formData.day_task = day;
+                formData.month_task = month;
+                formData.year_task = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date_start) {
+                const [year, month, day] = formData.date_start.split("-");
+                formData.day_strat = day;
+                formData.month_strat = month;
+                formData.year_strat = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day = day;
+                formData.month = month;
+                formData.year = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            
+            try {
+                // Отправляем POST-запрос
+                const response = await fetch(`${BASE_URL}/generate_p/rasporyajenie.docx`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                // Проверяем ответ сервера
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
+                }
+
+                // Получаем сгенерированный файл
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'generated_document.pdf'; // Название сохраняемого файла
+                a.click();
+
+                // Очищаем временный URL
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+            } catch (error) {
+                console.error("Ошибка генерации документа:", error.message);
+                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
+            }
         }
+        
         
     }
 });
@@ -677,62 +867,134 @@ document.addEventListener("click", async (event) => {
                 alert("Произошла ошибка при генерации документа.");
             }
         }else if(selectedTemplate == 'Приказ о начале разработки'){
-            // Преобразуем имена в формат "Фамилия И. О."
-            const transformName = (fullName) => {
-                const nameParts = fullName.split(' ');
-                if (nameParts.length === 3) {
-                    // Фамилия Имя Отчество
-                    return `${nameParts[0]} ${nameParts[1][0]}. ${nameParts[2][0]}.`;
-                } else if (nameParts.length === 2) {
-                    // Фамилия Имя
-                    return `${nameParts[0]} ${nameParts[1][0]}.`;
+            if (formData.date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day = day;
+                formData.month = month;
+                formData.year = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date_of_TD) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day_of_TD = day;
+                formData.month_of_TD = month;
+                formData.year_of_TD = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.term_date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.term_day = day;
+                formData.term_month = month;
+                formData.term_year = year;
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date_task) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day_task = day;
+                formData.month_task = month;
+                formData.year_task = year;
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            const fullName_b = formData.FIO;
+            if (fullName_b) {
+                const buyerNameParts = fullName_b.split(' ');
+                if (buyerNameParts.length === 3) {
+                    // Если имя состоит из Фамилия Имя Отчество
+                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
+                } else if (buyerNameParts.length === 2) {
+                    // Если имя состоит из Фамилия Имя
+                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
                 }
-                return fullName;
-            };
-            const transformDate = (dateField, formDataFieldPrefix) => {
-                if (formData[dateField]) {
-                    const [year, month, day] = formData[dateField].split("-");
-                    formData[`${formDataFieldPrefix}_day`] = day;
-                    formData[`${formDataFieldPrefix}_month`] = month;
-                    formData[`${formDataFieldPrefix}_year`] = year.slice(-1); // Последняя цифра года
-                } else {
-                    alert(`Пожалуйста, заполните поле ${dateField}.`);
-                    return false;
-                }
-                return true;
-            };
-            // Преобразуем все необходимые даты
-            if (
-                !transformDate("date", "date") ||
-                !transformDate("date_of_TD", "date_of_TD") ||
-                !transformDate("term_date", "term_date") ||
-                !transformDate("date_task", "date_task")
-            ) {
-                return; // Прерываем выполнение, если не все даты корректно заполнены
             }
-
-            // Преобразуем числовые значения (например, количество дней)
-            if (formData.count_of_day) {
-                const number = Number(formData.count_of_day);
-                if (!isNaN(number)) {
-                    formData.count_of_string_s = numToWords.convert(number); // Конвертация в слова
-                } else {
-                    alert("Пожалуйста, введите корректное число для 'Количество дней'.");
-                    return;
+            formData.FIO = fullName_b;
+            const fullName_a = formData.FIO_dir;
+            if (fullName_b) {
+                const buyerNameParts = fullName_a.split(' ');
+                if (buyerNameParts.length === 3) {
+                    // Если имя состоит из Фамилия Имя Отчество
+                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
+                } else if (buyerNameParts.length === 2) {
+                    // Если имя состоит из Фамилия Имя
+                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
                 }
             }
-
-            // Преобразуем сокращенные ФИО
-            if (formData.FIO) {
-                formData.FIO_short = transformName(formData.FIO);
-            }
-
-            if (formData.FIO_dir) {
-                formData.FIO_dir_short = transformName(formData.FIO_dir);
-            }
+            formData.FIO_dir = fullName_a;
             try {
                 // Отправляем POST-запрос на сервер для генерации PDF
                 const response = await fetch(`${BASE_URL}/generate_p/order.docx`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+    
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
+                }
+    
+                // Получаем PDF как Blob
+                const blob = await response.blob();
+    
+                // Создаём объект URL для отображения PDF
+                const pdfUrl = URL.createObjectURL(blob);
+    
+                // Отображаем PDF в контейнере для предпросмотра
+                const previewSector = document.getElementById('preview-container');
+                previewSector.innerHTML = ''; // Очищаем контейнер
+    
+                const pdfIframe = document.createElement('iframe');
+                pdfIframe.src = pdfUrl;
+                pdfIframe.width = '100%';
+                pdfIframe.height = '500px';
+                pdfIframe.style.border = 'none';
+    
+                previewSector.appendChild(pdfIframe);
+    
+            } catch (error) {
+                console.error("Ошибка генерации документа:", error.message);
+                alert("Произошла ошибка при генерации документа.");
+            }
+        }else if(selectedTemplate == 'Распоряжение'){
+            if (formData.date_task) {
+                const [year, month, day] = formData.date_task.split("-");
+                formData.day_task = day;
+                formData.month_task = month;
+                formData.year_task = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date_start) {
+                const [year, month, day] = formData.date_start.split("-");
+                formData.day_strat = day;
+                formData.month_strat = month;
+                formData.year_strat = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day = day;
+                formData.month = month;
+                formData.year = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            try {
+                // Отправляем POST-запрос на сервер для генерации PDF
+                const response = await fetch(`${BASE_URL}/generate_p/rasporyajenie.docx`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
