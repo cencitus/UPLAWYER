@@ -43,15 +43,89 @@
                   <!-- Контейнер для отображения результатов поиска -->
                 <div id="search-results-container" class="text-start mt-3"></div>
 
+                <div class="row">
+                    <!-- Тип документа 1 -->
+                    <div class="col-md-4 mb-3">
+                      <div class="dropdown">
+                        <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Распорядительные
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                          <li><a class="dropdown-item" data-type="Приказ" href="#">Приказ</a></li> <!--<input type="text" class="search-input" placeholder="Поиск..."> Между тегами <li></li> Это добавит строку поиска-->
+                          <li><a class="dropdown-item" data-type="Распоряжение" href="#">Распоряжение</a></li>
+                          <li><a class="dropdown-item" data-type="Инструкция" href="#">Инструкция</a></li>
+                        </ul>
+                      </div>
+                    </div>
+
+                                <!-- Тип документа 2 -->
+                    <div class="col-md-4 mb-3">
+                        <div class="dropdown">
+                        <button class="btn  dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Организационно-правовые
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li><a class="dropdown-item" data-type="Устав" href="#">Устав</a></li>
+                            <li><a class="dropdown-item" data-type="Договор" href="#">Договор</a></li>
+                        </ul>
+                        </div>
+                    </div>
                 
+                    <!-- Тип документа 3 -->
+                    <div class="col-md-4 mb-3">
+                        <div class="dropdown">
+                        <button class="btn  dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Кадровые
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li><a class="dropdown-item" data-type="Трудовой договор" href="#">Трудовой договор</a></li> <!--data-type прописать для всех-->
+                            <li><a class="dropdown-item" data-type="Приказ о приеме на работу" href="#">Приказ о приеме на работу</a></li> <!--или нет-->
+                        </ul>
+                        </div>
+                    </div>
+                
+                    <!-- Тип документа 4 -->
+                    <div class="col-md-4 mb-3">
+                        <div class="dropdown">
+                        <button class="btn  dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Нормативные
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li><a class="dropdown-item" data-type="ФЗ «О рекламе»" href="#">ФЗ «О рекламе»</a></li>
+                            <li><a class="dropdown-item" data-type="ФЗ «О лицензировании отдельных видов деятельности»" href="#">ФЗ «О лицензировании отдельных видов деятельности»</a></li>
+                            <li><a class="dropdown-item" data-type="ФЗ «О защите прав потребителей»" href="#">ФЗ «О защите прав потребителей»</a></li>
+                        </ul>
+                        </div>
+                    </div>
+                
+                    <!-- Тип документа 5 -->
+                    <div class="col-md-4 mb-3">
+                        <div class="dropdown">
+                        <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Информационно-справочные
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li><a class="dropdown-item" data-type="Справка" href="#">Справка</a></li>
+                            <li><a class="dropdown-item" data-type="Докладная записка" href="#">Докладная записка</a></li>
+                        </ul>
+                        </div>
+                    </div>
+                
+                    <!-- Тип документа 6 -->
+                    <div class="col-md-4 mb-3">
+                        <div class="dropdown">
+                        <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Коммерческие
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li><a class="dropdown-item" data-type="Коммерческое предложение" href="#">Коммерческое предложение</a></li>
+                            <li><a class="dropdown-item" data-type="Договор купли-продажи" href="#">Договор купли-продажи</a></li>
+                        </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-
         </div>
-
-
-
-
     </div>
 </body>
 </html>
