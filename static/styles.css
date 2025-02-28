@@ -36,11 +36,84 @@ a:hover {
     margin-bottom: 10px;
 }
 
+.authorize {
+    margin-right: 10px; 
+}
+
+.container {
+    max-width: 1350px;
+}
+
 .create-text {
     font-size: 42px;
     font-weight: 600;
     font-family: "Poppins", sans-serif;
 }
+.choose-text {
+    font-size: 18px;
+    font-weight: 500;
+    font-family: "Poppins", sans-serif;
+}
+
+.btn {
+    background-color: transparent;
+    border: 1px solid #63686d; 
+    color: #63686d; 
+    transition: all 0.3s ease; 
+}
+  
+.btn:hover {
+    background-color: #63686d; 
+    color: #ffffff; 
+}
+
+.dropdown-menu {
+    background-color: #ffffff; 
+    border: 1px solid #6c757d; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Тень как у выпадающего списка */
+}
+  
+.dropdown-item {
+    color: #6c757d;
+    transition: all 0.3s ease; 
+}
+  
+.dropdown-item:hover {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+  
+.dropdown-item:active {
+    background-color: #5c636a;
+    color: #ffffff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.my-6 {
+    padding-bottom: 1px;
+    width: 60%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 17px;
+}
+.form-label {
+    margin: 1px;
+}
+.mb-4 {
+    margin-bottom: 5px !important;
+}
+
 
 @media (max-width: 1000px) {
     .my-6{
