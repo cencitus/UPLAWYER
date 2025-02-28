@@ -60,6 +60,16 @@ searchInput.addEventListener('focus', function () {
 // Блок для отображения содержимого
 const contentDiv = document.getElementById('qwerty');
 
+// Шаблоны документов
+const documentFields = {
+    'Трудовой договор': [
+        { label: 'Дата заявления', type: 'date', id: 'date-statement' },
+        { label: 'ФИО заявителя', type: 'text', id: 'applicant-name' },
+        { label: 'Наименование организации', type: 'text', id: 'organization-name' },
+        { label: 'Город', type: 'text', id: 'city' },
+    ]
+};
+
 function handleDocumentSelection(event) {
     // Проверяем, был ли клик по элементу .dropdown-item
     if (event.target.classList.contains('dropdown-item')) {
@@ -93,14 +103,4 @@ function handleDocumentSelection(event) {
 searchInputs.forEach(menu => {
     menu.addEventListener('click', handleDocumentSelection);
 });
-
-// Шаблоны документов
-const documentFields = {
-    'Трудовой договор': [
-        { label: 'Дата заявления', type: 'date', id: 'date-statement' },
-        { label: 'ФИО заявителя', type: 'text', id: 'applicant-name' },
-        { label: 'Наименование организации', type: 'text', id: 'organization-name' },
-        { label: 'Город', type: 'text', id: 'city' },
-    ]
-};
 
