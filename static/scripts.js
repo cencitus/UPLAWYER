@@ -56,3 +56,51 @@ searchInput.addEventListener('focus', function () {
 });
 
 // --------------------------------------------------------------------- Выбор документа
+
+// Блок для отображения содержимого
+const contentDiv = document.getElementById('qwerty');
+
+function handleDocumentSelection(event) {
+    // Проверяем, был ли клик по элементу .dropdown-item
+    if (event.target.classList.contains('dropdown-item')) {
+        event.preventDefault(); // Останавливаем стандартное действие (переход по ссылке)
+
+        // Получаем значение атрибута data-type (если оно есть) или определяем тип по тексту
+        const type = event.target.getAttribute('data-type') || event.target.textContent.trim();
+
+        const contentDiv = document.getElementById('qwerty'); // Контейнер для отображения содержимого
+        contentDiv.innerHTML = ''; // Очищаем содержимое
+
+        // Проверяем, есть ли данные для выбранного типа документа
+        if (documentFields[type]) {
+            const fields = documentFields[type];
+            
+            // Создаем форму
+            const form = document.createElement('form');
+            //form.classList.add('document-form', 'p-4', 'bg-light', 'rounded', 'shadow-sm'); // Добавляем стили
+            form.classList.add('container', 'my-6', 'bg-light', 'rounded', 'shadow-sm'); // Добавляем стили
+          
+
+          
+            contentDiv.appendChild(form); // Добавляем форму в контейнер
+          } else {
+            // Если данных для типа документа нет
+            contentDiv.innerHTML = `<p>Для выбранного типа документа нет данных для отображения.</p>`;
+        }
+    }
+}
+
+searchInputs.forEach(menu => {
+    menu.addEventListener('click', handleDocumentSelection);
+});
+
+// Шаблоны документов
+const documentFields = {
+    'Трудовой договор': [
+        { label: 'Дата заявления', type: 'date', id: 'date-statement' },
+        { label: 'ФИО заявителя', type: 'text', id: 'applicant-name' },
+        { label: 'Наименование организации', type: 'text', id: 'organization-name' },
+        { label: 'Город', type: 'text', id: 'city' },
+    ]
+};
+
