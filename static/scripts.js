@@ -42,3 +42,17 @@ searchInput.addEventListener('input', function () {
         searchResults.appendChild(noResult);
     }
 });
+
+// Скрываем результаты, если поиск пуст
+searchInput.addEventListener('blur', function () {
+    setTimeout(() => searchResults.classList.remove('show'), 200); // Скроем через задержку, чтобы успел сработать клик
+});
+
+// Показываем результаты при фокусе
+searchInput.addEventListener('focus', function () {
+    if (searchInput.value) {
+        searchResults.classList.add('show'); // Показываем результаты при повторном фокусе
+    }
+});
+
+// --------------------------------------------------------------------- Выбор документа
