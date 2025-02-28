@@ -90,7 +90,51 @@ function handleDocumentSelection(event) {
             //form.classList.add('document-form', 'p-4', 'bg-light', 'rounded', 'shadow-sm'); // Добавляем стили
             form.classList.add('container', 'my-6', 'bg-light', 'rounded', 'shadow-sm'); // Добавляем стили
           
+            // Проходим по каждому полю и создаем элементы ввода
+            fields.forEach(field => {
+              const formGroup = document.createElement('div');
+              formGroup.classList.add('mb-4');
+          
+              const label = document.createElement('label');
+              label.setAttribute('for', field.id);
+              label.textContent = field.label;
+              label.classList.add('form-label'); // Стиль для метки
+          
+              const input = document.createElement('input');
+              input.setAttribute('type', field.type);
+              input.setAttribute('id', field.id);
+              input.classList.add('form-control'); // Класс Bootstrap для поля ввода
+          
+              // Добавляем элементы в форму
+              formGroup.appendChild(label);
+              formGroup.appendChild(input);
+              form.appendChild(formGroup);
+            });
+          
+            const submitButton = document.createElement('button');
+            submitButton.setAttribute('type', 'submit');
+            submitButton.classList.add('btn', 'save-button'); // Класс для кнопки
+            submitButton.textContent = 'Создать документ';
 
+            // Кнопка отправки
+            const docxButton = document.createElement('button');
+            docxButton.setAttribute('type', 'submit');
+            docxButton.classList.add('fileButton'); // Класс для кнопки
+            docxButton.textContent = 'Скачать документ .docx';
+
+            const PDFButton = document.createElement('button');
+            PDFButton.setAttribute('type', 'submit');
+            PDFButton.classList.add('fileButton'); // Класс для кнопки
+            PDFButton.textContent = 'Скачать документ .pdf';
+
+            const previewContainer = document.createElement('div');
+            previewContainer.setAttribute('id', 'preview-container');
+            previewContainer.classList.add('my-4');
+          
+            form.appendChild(submitButton); 
+            form.appendChild(PDFButton); 
+            form.appendChild(docxButton); // Добавляем кнопку в форму
+            form.appendChild(previewContainer);
           
             contentDiv.appendChild(form); // Добавляем форму в контейнер
           } else {
