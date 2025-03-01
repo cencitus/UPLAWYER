@@ -1,5 +1,7 @@
 let selectedTemplate = '';
 
+const BASE_URL = 'http://127.0.0.1:5500';
+
 // Получаем все поля ввода в выпадающих списках
 const searchInputs = document.querySelectorAll('.dropdown-menu');
 
@@ -151,6 +153,13 @@ searchInputs.forEach(menu => {
     menu.addEventListener('click', handleDocumentSelection);
 });
 
+document.querySelectorAll('.dropdown-item').forEach(item => {
+    item.addEventListener('click', (event) => {
+        selectedTemplate = event.target.textContent.trim();
+        console.log('Выбран шаблон:', selectedTemplate);
+    });
+});
+
 document.addEventListener('click', async (event) => {
     // Проверяем, что нажата кнопка "Сохранить данные"
     if (event.target && event.target.textContent.trim() === 'Скачать документ .docx') {
@@ -214,7 +223,7 @@ document.addEventListener('click', async (event) => {
 
             try {
                 // Отправляем POST-запрос
-                const response = await fetch(`${BASE_URL}/generate_d/purchase%26sale_agreement.docx`, {
+                const response = await fetch(`${BASE_URL}/generated/purchase%26sale_agreement.docx`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
