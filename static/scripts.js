@@ -72,6 +72,18 @@ const documentFields = {
         { label: 'Название вещи', type: 'text', id: 'name_of_things' },
         { label: 'Стоимость вещи', type: 'text', id: 'cost' },
         { label: 'Количество дней для передачи товара', type: 'text', id: 'count_day' },
+    ],
+    'Трудовой договор': [
+        { label: 'Дата заявления', type: 'date', id: 'date-statement' },
+        { label: 'ФИО заявителя', type: 'text', id: 'applicant-name' },
+        { label: 'Наименование организации', type: 'text', id: 'organization-name' },
+        { label: 'Город', type: 'text', id: 'city' },
+    ],
+    'Приказ о приеме на работу': [
+        { label: 'Дата заключения', type: 'date', id: 'date-contract' },
+        { label: 'ФИО арендодателя', type: 'text', id: 'landlord-name' },
+        { label: 'ФИО арендатора', type: 'text', id: 'tenant-name' },
+        { label: 'Адрес недвижимости', type: 'text', id: 'property-address' },
     ]
 };
 
