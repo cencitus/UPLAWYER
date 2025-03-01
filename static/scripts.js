@@ -109,6 +109,18 @@ const documentFields = {
         { label: 'Должность руководителя организации', type: 'text', id: 'post_boss' },
         { label: 'ФИО руководителя организации', type: 'text', id: 'FIO_boss' },
         { label: 'Документ, на основании которого действует руководитель', type: 'text', id: 'document' },
+    ],
+    'Распоряжение': [
+        { label: 'Название организации', type: 'text', id: 'name_of_organization' },
+        {label: 'Номер распоряжения', type: 'text', id: 'number_of_order' },
+        { label: 'Номер рекламной стратегии', type: 'text', id: 'num_of_task' },
+        { label: 'Дата рекламной стратегии', type: 'date', id: 'date_start' },
+        { label: 'Дата распоряжения', type: 'date', id: 'date' },
+        { label: 'Город', type: 'text', id: 'city' },
+        { label: 'ФИО маркетолога', type: 'text', id: 'FIO' },
+        { label: 'Дата завершения', type: 'date', id: 'date_task' },
+        { label: 'Должность отдавшего распоряжение', type: 'text', id: 'post_boss' },
+        { label: 'ФИО отдавшего распоряжение', type: 'text', id: 'FIO_boss' },
     ]
 };
 
