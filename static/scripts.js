@@ -62,11 +62,14 @@ const contentDiv = document.getElementById('qwerty');
 
 // Шаблоны документов
 const documentFields = {
-    'Трудовой договор': [
-        { label: 'Дата заявления', type: 'date', id: 'date-statement' },
-        { label: 'ФИО заявителя', type: 'text', id: 'applicant-name' },
-        { label: 'Наименование организации', type: 'text', id: 'organization-name' },
+    'Договор купли-продажи': [
+        { label: 'Дата заявления', type: 'date', id: 'date' },
         { label: 'Город', type: 'text', id: 'city' },
+        { label: 'ФИО продавца', type: 'text', id: 'name_of_seller' },
+        { label: 'ФИО покупателя', type: 'text', id: 'name_of_buyer' },
+        { label: 'Название вещи', type: 'text', id: 'name_of_things' },
+        { label: 'Стоимость вещи', type: 'text', id: 'cost' },
+        { label: 'Количество дней для передачи товара', type: 'text', id: 'count_day' },
     ]
 };
 
@@ -148,30 +151,98 @@ searchInputs.forEach(menu => {
     menu.addEventListener('click', handleDocumentSelection);
 });
 
-function generateForm(documentType) {
-    const form = document.getElementById('document-form');
-    form.innerHTML = ''; // Очищаем форму
+document.addEventListener('click', async (event) => {
+    // Проверяем, что нажата кнопка "Сохранить данные"
+    if (event.target && event.target.textContent.trim() === 'Скачать документ .docx') {
+        event.preventDefault(); // Отключаем стандартное поведение кнопки
 
-    const fields = documentFields[documentType];
-    if (fields) {
-        fields.forEach(field => {
-            const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'form-group mb-3';
+        // Собираем данные из формы
+        const form = event.target.closest("form"); // Находим текущую форму
+        const formData = {};
 
-            const label = document.createElement('label');
-            label.textContent = field.label;
-            label.setAttribute('for', field.id);
-
-            const input = document.createElement('input');
-            input.type = field.type;
-            input.id = field.id;
-            input.className = 'form-control';
-
-            fieldDiv.appendChild(label);
-            fieldDiv.appendChild(input);
-            form.appendChild(fieldDiv);
+        // Проходимся по всем элементам формы и собираем данные
+        form.querySelectorAll("input").forEach(input => {
+            formData[input.id] = input.value.trim(); // Используем id как ключи для данных
         });
-    } else {
-        form.innerHTML = '<p>Тип документа не поддерживается.</p>';
+        if (selectedTemplate == 'Договор купли-продажи') {
+            // Сохраняем полное имя продавца
+            const fullName = formData.name_of_seller;
+
+            // Преобразуем имя продавца в формат "Фамилия И. О."
+            if (fullName) {
+                const sellerNameParts = fullName.split(' ');
+                if (sellerNameParts.length === 3) {
+                    // Если имя состоит из Фамилия Имя Отчество
+                    formData.name_of_seller_short = `${sellerNameParts[0]} ${sellerNameParts[1][0]}. ${sellerNameParts[2][0]}.`;
+                } else if (sellerNameParts.length === 2) {
+                    // Если имя состоит из Фамилия Имя
+                    formData.name_of_seller_short = `${sellerNameParts[0]} ${sellerNameParts[1][0]}.`;
+                }
+            }
+
+            // Здесь сохраняем полное имя отдельно, если нужно использовать позже
+            formData.full_name_of_seller = fullName;
+
+            // Сохраняем полное имя продавца
+            const fullName_b = formData.name_of_buyer;
+
+            // Преобразуем имя продавца в формат "Фамилия И. О."
+            if (fullName_b) {
+                const buyerNameParts = fullName_b.split(' ');
+                if (buyerNameParts.length === 3) {
+                    // Если имя состоит из Фамилия Имя Отчество
+                    formData.name_of_buyer_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
+                } else if (buyerNameParts.length === 2) {
+                    // Если имя состоит из Фамилия Имя
+                    formData.name_of_buyer_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
+                }
+            }
+
+            // Здесь сохраняем полное имя отдельно, если нужно использовать позже
+            formData.full_name_of_buyer = fullName_b;
+
+
+            if (formData.date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day = day;
+                formData.month = month;
+                formData.year = year;
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+
+            try {
+                // Отправляем POST-запрос
+                const response = await fetch(`${BASE_URL}/generate_d/purchase%26sale_agreement.docx`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                // Проверяем ответ сервера
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
+                }
+
+                // Получаем сгенерированный файл
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'generated_document.docx'; // Название сохраняемого файла
+                a.click();
+
+                // Очищаем временный URL
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+            } catch (error) {
+                console.error("Ошибка генерации документа:", error.message);
+                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
+            }
+        }
+        
     }
-}
+});
