@@ -139,7 +139,7 @@ function handleDocumentSelection(event) {
             contentDiv.appendChild(form); // Добавляем форму в контейнер
           } else {
             // Если данных для типа документа нет
-            contentDiv.innerHTML = `<p>Для выбранного типа документа нет данных для отображения.</p>`;
+            contentDiv.innerHTML = `<p class="create-text h4 mb-4" style="text-align:center; margin-top:5%;">Для выбранного типа документа нет данных для отображения.</p>`;
         }
     }
 }
