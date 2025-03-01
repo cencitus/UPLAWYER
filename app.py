@@ -87,6 +87,12 @@ def generate_pdf_document(name_of_doc):
 
         temp_docx_path = 'temp_document.docx'
         doc.save(temp_docx_path)
+
+        # Конвертируем .docx в .pdf
+        output_pdf_path = 'generated_document.pdf'
+        convert("temp_document.docx", "generated_document.pdf")
+        return send_file(output_pdf_path, as_attachment=True, download_name='generated_document.pdf')
+    
     except Exception as e:
         # Логируем ошибку в консоль
         app.logger.error(f"Ошибка: {e}")
