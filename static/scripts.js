@@ -409,7 +409,6 @@ document.addEventListener("click", async (event) => {
         // Собираем данные из формы
         const form = event.target.closest("form");
         const formData = {};
-        let ID;
 
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim();
@@ -436,7 +435,21 @@ document.addEventListener("click", async (event) => {
             // Сохраняем полное имя продавца
             const fullName_b = formData.name_of_buyer;
 
-
+                        // Преобразуем имя продавца в формат "Фамилия И. О."
+                        if (fullName_b) {
+                            const buyerNameParts = fullName_b.split(' ');
+                            if (buyerNameParts.length === 3) {
+                                // Если имя состоит из Фамилия Имя Отчество
+                                formData.name_of_buyer_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
+                            } else if (buyerNameParts.length === 2) {
+                                // Если имя состоит из Фамилия Имя
+                                formData.name_of_buyer_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
+                            }
+                        }
+            
+                        // Здесь сохраняем полное имя отдельно, если нужно использовать позже
+                        formData.full_name_of_buyer = fullName_b;
+            
             if (formData.date) {
                 const [year, month, day] = formData.date.split("-");
                 formData.day = day;
@@ -476,7 +489,7 @@ document.addEventListener("click", async (event) => {
     
                 previewSector.appendChild(pdfIframe);
     
-            }
+            } 
         }
     }
 })
