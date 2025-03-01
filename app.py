@@ -76,6 +76,17 @@ def generate_pdf_document(name_of_doc):
 
         # Загружаем шаблон
         doc = Document(template_path)
+        
+        # Заменяем плейсхолдеры в тексте
+        for paragraph in doc.paragraphs:
+            for key, value in data.items():
+                placeholder = f'{{{{ {key} }}}}'
+                if placeholder in paragraph.text:
+                    paragraph.text = paragraph.text.replace(placeholder, value)
+                    apply_styles_to_paragraph(paragraph)
+
+        temp_docx_path = 'temp_document.docx'
+        doc.save(temp_docx_path)
     except Exception as e:
         # Логируем ошибку в консоль
         app.logger.error(f"Ошибка: {e}")
