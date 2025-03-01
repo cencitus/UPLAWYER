@@ -61,5 +61,27 @@ def generate_docx_document(name_of_doc):
         app.logger.error(traceback.format_exc())
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
     
+@app.route('/generate_p/<name_of_doc>', methods=['POST'])
+def generate_pdf_document(name_of_doc):
+    try:
+        # Получаем данные из запроса
+        data = request.json
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        # Указываем путь к шаблону
+        template_path = os.path.join('templates', name_of_doc)
+        if not os.path.exists(template_path):
+            return jsonify({"error": f"Template file not found: {template_path}"}), 404
+
+        # Загружаем шаблон
+        doc = Document(template_path)
+    except Exception as e:
+        # Логируем ошибку в консоль
+        app.logger.error(f"Ошибка: {e}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
+        
+    
 if __name__ == '__main__':
     app.run(debug=True,port=5500, threaded=False)
