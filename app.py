@@ -98,7 +98,16 @@ def generate_pdf_document(name_of_doc):
         app.logger.error(f"Ошибка: {e}")
         app.logger.error(traceback.format_exc())
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
-        
+
+@app.route('/generate_preview', methods=['POST'])
+def generate_preview():
+    data = request.get_json()
+    
+    # Генерация документа (например, PDF или DOCX)
+    generated_file = generate_pdf_document(data)  # Функция, которая генерирует документ
+
+    # Возвращаем сгенерированный файл
+    return send_file(generated_file, as_attachment=False)    
     
 if __name__ == '__main__':
     app.run(debug=True,port=5500, threaded=False)
