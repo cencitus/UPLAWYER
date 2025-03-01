@@ -401,3 +401,82 @@ document.addEventListener("click", async (event) => {
     }
 });
 
+// Добавляем обработчик для кнопки "Создать документ"
+document.addEventListener("click", async (event) => {
+    if (event.target && event.target.textContent.trim() === 'Создать документ') {
+        event.preventDefault();
+
+        // Собираем данные из формы
+        const form = event.target.closest("form");
+        const formData = {};
+        let ID;
+
+        form.querySelectorAll("input").forEach(input => {
+            formData[input.id] = input.value.trim();
+        });
+        if (selectedTemplate == 'Договор купли-продажи') {
+            // Сохраняем полное имя продавца
+            const fullName = formData.name_of_seller;
+
+            // Преобразуем имя продавца в формат "Фамилия И. О."
+            if (fullName) {
+                const sellerNameParts = fullName.split(' ');
+                if (sellerNameParts.length === 3) {
+                    // Если имя состоит из Фамилия Имя Отчество
+                    formData.name_of_seller_short = `${sellerNameParts[0]} ${sellerNameParts[1][0]}. ${sellerNameParts[2][0]}.`;
+                } else if (sellerNameParts.length === 2) {
+                    // Если имя состоит из Фамилия Имя
+                    formData.name_of_seller_short = `${sellerNameParts[0]} ${sellerNameParts[1][0]}.`;
+                }
+            }
+
+            // Здесь сохраняем полное имя отдельно, если нужно использовать позже
+            formData.full_name_of_seller = fullName;
+
+            // Сохраняем полное имя продавца
+            const fullName_b = formData.name_of_buyer;
+
+
+            if (formData.date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day = day;
+                formData.month = month;
+                formData.year = year;
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }  
+            try {
+                // Отправляем POST-запрос на сервер для генерации PDF
+                const response = await fetch(`${BASE_URL}/generate_p/purchase%26sale_agreement.docx`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+    
+                
+    
+                // Получаем PDF как Blob
+                const blob = await response.blob();
+    
+                // Создаём объект URL для отображения PDF
+                const pdfUrl = URL.createObjectURL(blob);
+    
+                // Отображаем PDF в контейнере для предпросмотра
+                const previewSector = document.getElementById('preview-container');
+                previewSector.innerHTML = ''; // Очищаем контейнер
+    
+                const pdfIframe = document.createElement('iframe');
+                pdfIframe.src = pdfUrl;
+                pdfIframe.width = '100%';
+                pdfIframe.height = '500px';
+                pdfIframe.style.border = 'none';
+    
+                previewSector.appendChild(pdfIframe);
+    
+            }
+        }
+    }
+})
