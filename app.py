@@ -4,7 +4,7 @@ from docx import Document
 from docx.shared import Pt, RGBColor
 import traceback
 import os
-
+from docx2pdf import convert
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5500"}})
