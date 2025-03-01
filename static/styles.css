@@ -60,6 +60,7 @@ a:hover {
     border: 1px solid #63686d; 
     color: #63686d; 
     transition: all 0.3s ease; 
+    margin-right: 1%;
 }
   
 .btn:hover {

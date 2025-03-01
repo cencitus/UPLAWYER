@@ -119,12 +119,12 @@ function handleDocumentSelection(event) {
             // Кнопка отправки
             const docxButton = document.createElement('button');
             docxButton.setAttribute('type', 'submit');
-            docxButton.classList.add('fileButton'); // Класс для кнопки
+            docxButton.classList.add('btn', 'save-button'); // Класс для кнопки
             docxButton.textContent = 'Скачать документ .docx';
 
             const PDFButton = document.createElement('button');
             PDFButton.setAttribute('type', 'submit');
-            PDFButton.classList.add('fileButton'); // Класс для кнопки
+            PDFButton.classList.add('btn', 'save-button'); // Класс для кнопки
             PDFButton.textContent = 'Скачать документ .pdf';
 
             const previewContainer = document.createElement('div');
@@ -148,3 +148,30 @@ searchInputs.forEach(menu => {
     menu.addEventListener('click', handleDocumentSelection);
 });
 
+function generateForm(documentType) {
+    const form = document.getElementById('document-form');
+    form.innerHTML = ''; // Очищаем форму
+
+    const fields = documentFields[documentType];
+    if (fields) {
+        fields.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group mb-3';
+
+            const label = document.createElement('label');
+            label.textContent = field.label;
+            label.setAttribute('for', field.id);
+
+            const input = document.createElement('input');
+            input.type = field.type;
+            input.id = field.id;
+            input.className = 'form-control';
+
+            fieldDiv.appendChild(label);
+            fieldDiv.appendChild(input);
+            form.appendChild(fieldDiv);
+        });
+    } else {
+        form.innerHTML = '<p>Тип документа не поддерживается.</p>';
+    }
+}
