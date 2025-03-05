@@ -319,7 +319,13 @@ document.addEventListener("click", async (event) => {
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim(); // Используем id как ключи для данных
         });
-
+        if (formData.FIO_boss) {
+            const fio = formData.FIO;
+            if (!fio || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
             const fullName = formData.name_of_seller;
