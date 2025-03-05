@@ -231,6 +231,8 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     });
 });
 
+
+//СКАЧАТЬ ДОК
 document.addEventListener('click', async (event) => {
     // Проверяем, что нажата кнопка "Сохранить данные"
     if (event.target && event.target.textContent.trim() === 'Скачать документ .docx') {
@@ -329,7 +331,21 @@ document.addEventListener('click', async (event) => {
                 alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
             }
         }
-        
+        else if(selectedTemplate == 'Распоряжение'){
+            if (formData.date_task) {
+                const [year, month, day] = formData.date_task.split("-");
+                formData.day_task = day;
+                formData.month_task = month;
+                formData.year_task = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+    
+
+
+
+        }
     }
 });
 
