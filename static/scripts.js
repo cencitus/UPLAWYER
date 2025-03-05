@@ -319,9 +319,8 @@ document.addEventListener("click", async (event) => {
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim(); // Используем id как ключи для данных
         });
-        if (formData.FIO_boss) {
-            const fio = formData.FIO;
-            if (!fio || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio)) {
+        if (formData.FIO) {
+            if (!/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(formData.FIO)) {
                 alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
                 return;
             }
