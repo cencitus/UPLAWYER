@@ -341,7 +341,15 @@ document.addEventListener('click', async (event) => {
                 alert("Пожалуйста, заполните поле даты.");
                 return;
             }
-    
+        if (formData.date_start) {
+                const [year, month, day] = formData.date_start.split("-");
+                formData.day_strat = day;
+                formData.month_strat = month;
+                formData.year_strat = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
 
 
 
