@@ -243,6 +243,7 @@ document.addEventListener('click', async (event) => {
                 return;
             }
         }
+
         if (formData.FIO_dir) {
             const fio_dir = formData.FIO_dir;
             if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
@@ -495,7 +496,11 @@ document.addEventListener("click", async (event) => {
             formData[input.id] = input.value.trim();
         });
 
-
+        const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
+        if (!allFieldsFilled) {
+            alert("Пожалуйста, заполните все поля формы.");
+            return;
+        }
 
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
