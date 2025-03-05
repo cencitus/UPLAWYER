@@ -319,15 +319,25 @@ document.addEventListener("click", async (event) => {
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim(); // Используем id как ключи для данных
         });
+        // Проверка ФИО исполнителя
         if (formData.FIO) {
             if (!/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(formData.FIO)) {
                 alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
                 return;
             }
         }
+        // Проверка ФИО руководителя
         if (formData.FIO_boss) {
             const fio_boss = formData.FIO_boss;
             if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+         // Проверка ФИО директора
+        if (formData.FIO_dir) {
+            const fio_dir = formData.FIO_dir;
+            if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
                 alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
                 return;
             }
