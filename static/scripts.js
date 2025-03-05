@@ -326,6 +326,13 @@ document.addEventListener("click", async (event) => {
                 return;
             }
         }
+        if (formData.FIO_boss) {
+            const fio_boss = formData.FIO_boss;
+            if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
             const fullName = formData.name_of_seller;
