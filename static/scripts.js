@@ -372,7 +372,12 @@ document.addEventListener('click', async (event) => {
                     },
                     body: JSON.stringify(formData),
                 });
-
+                 // Проверяем ответ сервера
+                 if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
+                }
+               
 
             }
         
