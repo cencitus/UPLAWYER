@@ -245,47 +245,9 @@ document.addEventListener('click', async (event) => {
             formData[input.id] = input.value.trim(); // Используем id как ключи для данных
         });
 
-        const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
-        if (!allFieldsFilled) {
-            alert("Пожалуйста, заполните все поля формы.");
+        // Валидация данных формы
+        if (!validateFormData(formData)) {
             return;
-        }
-
-        if (formData.FIO_boss) {
-            const fio = formData.FIO;
-            if (!fio || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        } 
-        if (formData.FIO_boss) {
-            const fio_boss = formData.FIO_boss;
-            if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-
-        if (formData.FIO_dir) {
-            const fio_dir = formData.FIO_dir;
-            if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.name_of_seller) {
-            const fio_seller = formData.name_of_seller;
-            if (!fio_seller || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_seller)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.name_of_buyer) {
-            const fio_buyer = formData.name_of_buyer;
-            if (!fio_buyer || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_buyer)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
         }
 
         if (selectedTemplate == 'Договор купли-продажи') {
@@ -381,48 +343,9 @@ document.addEventListener("click", async (event) => {
         const form = event.target.closest("form"); // Находим текущую форму
         const formData = {};
 
-        // Проходимся по всем элементам формы и собираем данные
-        form.querySelectorAll("input").forEach(input => {
-            formData[input.id] = input.value.trim(); // Используем id как ключи для данных
-        });
-        // Проверка ФИО исполнителя
-        if (formData.FIO) {
-            if (!/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(formData.FIO)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        // Проверка ФИО руководителя
-        if (formData.FIO_boss) {
-            const fio_boss = formData.FIO_boss;
-            if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-         // Проверка ФИО директора
-        if (formData.FIO_dir) {
-            const fio_dir = formData.FIO_dir;
-            if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-          // Проверка ФИО продавца
-        if (formData.name_of_seller) {
-            const fio_seller = formData.name_of_seller;
-            if (!fio_seller || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_seller)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        //проверка ФИО покупателя
-        if (formData.name_of_buyer) {
-            const fio_buyer = formData.name_of_buyer;
-            if (!fio_buyer || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_buyer)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
+        // Валидация данных формы
+        if (!validateFormData(formData)) {
+            return;
         }
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
@@ -518,47 +441,10 @@ document.addEventListener("click", async (event) => {
             formData[input.id] = input.value.trim();
         });
 
-        const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
-        if (!allFieldsFilled) {
-            alert("Пожалуйста, заполните все поля формы.");
+        // Валидация данных формы
+        if (!validateFormData(formData)) {
             return;
         }
-        if (formData.FIO_boss) {
-            const fio = formData.FIO;
-            if (!fio || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.FIO_boss) {
-            const fio_boss = formData.FIO_boss;
-            if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.FIO_dir) {
-            const fio_dir = formData.FIO_dir;
-            if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.name_of_seller) {
-            const fio_seller = formData.name_of_seller;
-            if (!fio_seller || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_seller)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.name_of_buyer) {
-            const fio_buyer = formData.name_of_buyer;
-            if (!fio_buyer || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_buyer)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-
 
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
