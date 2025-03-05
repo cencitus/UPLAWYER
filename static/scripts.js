@@ -331,6 +331,10 @@ document.addEventListener('click', async (event) => {
                 alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
             }
         }
+
+//СЮДА ВСТАВИТЬ НАДО ПРИКАЗ else if(selectedTemplate == 'Приказ о начале разработки'){
+
+
         else if(selectedTemplate == 'Распоряжение'){
             if (formData.date_task) {
                 const [year, month, day] = formData.date_task.split("-");
@@ -359,7 +363,19 @@ document.addEventListener('click', async (event) => {
                 alert("Пожалуйста, заполните поле даты.");
                 return;
             }
+            try {
+                // Отправляем POST-запрос
+                const response = await fetch(`${BASE_URL}/generate_d/rasporyajenie.docx`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
 
+
+            }
+        
 
         }
     }
