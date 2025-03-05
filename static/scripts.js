@@ -222,6 +222,15 @@ document.addEventListener('click', async (event) => {
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim(); // Используем id как ключи для данных
         });
+
+        const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
+        if (!allFieldsFilled) {
+            alert("Пожалуйста, заполните все поля формы.");
+            return;
+        }
+
+
+
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
             const fullName = formData.name_of_seller;
@@ -451,6 +460,9 @@ document.addEventListener("click", async (event) => {
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim();
         });
+
+
+
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
             const fullName = formData.name_of_seller;
