@@ -350,7 +350,15 @@ document.addEventListener('click', async (event) => {
                 alert("Пожалуйста, заполните поле даты.");
                 return;
             }
-
+        if (formData.date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day = day;
+                formData.month = month;
+                formData.year = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
 
 
         }
