@@ -15,7 +15,7 @@ function validateFormData(formData) {
     const fioFields = ['FIO', 'FIO_boss', 'FIO_dir', 'name_of_seller', 'name_of_buyer'];
     for (const field of fioFields) {
         if (formData[field] && !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(formData[field])) {
-            alert(`Пожалуйста, введите корректное ФИО в поле "${field}" в формате 'Фамилия Имя Отчество'.`);
+            alert(`Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.`);
             return false;
         }
     }
