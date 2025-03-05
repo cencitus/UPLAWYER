@@ -2,6 +2,28 @@ let selectedTemplate = '';
 
 const BASE_URL = 'http://127.0.0.1:5500';
 
+//функция для валидации
+function validateFormData(formData) {
+    // Проверка, что все поля заполнены
+    const allFieldsFilled = Object.values(formData).every(value => value.trim() !== "");
+    if (!allFieldsFilled) {
+        alert("Пожалуйста, заполните все поля формы.");
+        return false;
+    }
+
+    // Проверка корректности ФИО (если такие поля есть)
+    const fioFields = ['FIO', 'FIO_boss', 'FIO_dir', 'name_of_seller', 'name_of_buyer'];
+    for (const field of fioFields) {
+        if (formData[field] && !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(formData[field])) {
+            alert(`Пожалуйста, введите корректное ФИО в поле "${field}" в формате 'Фамилия Имя Отчество'.`);
+            return false;
+        }
+    }
+
+    // Если все проверки пройдены
+    return true;
+}
+
 // Получаем все поля ввода в выпадающих списках
 const searchInputs = document.querySelectorAll('.dropdown-menu');
 
