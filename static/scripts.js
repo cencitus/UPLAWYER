@@ -377,8 +377,21 @@ document.addEventListener('click', async (event) => {
                     const errorText = await response.text();
                     throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
                 }
+                // Получаем сгенерированный файл
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'generated_document.docx'; // Название сохраняемого файла
+                a.click();
+
+                // Очищаем временный URL
+                setTimeout(() => URL.revokeObjectURL(url), 100);
                
 
+            }catch (error) {
+                console.error("Ошибка генерации документа:", error.message);
+                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
             }
         
 
