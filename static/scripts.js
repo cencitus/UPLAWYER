@@ -501,6 +501,42 @@ document.addEventListener("click", async (event) => {
             alert("Пожалуйста, заполните все поля формы.");
             return;
         }
+        if (formData.FIO_boss) {
+            const fio = formData.FIO;
+            if (!fio || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.FIO_boss) {
+            const fio_boss = formData.FIO_boss;
+            if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.FIO_dir) {
+            const fio_dir = formData.FIO_dir;
+            if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.name_of_seller) {
+            const fio_seller = formData.name_of_seller;
+            if (!fio_seller || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_seller)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+        if (formData.name_of_buyer) {
+            const fio_buyer = formData.name_of_buyer;
+            if (!fio_buyer || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_buyer)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
+
 
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
