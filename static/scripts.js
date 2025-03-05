@@ -342,6 +342,14 @@ document.addEventListener("click", async (event) => {
                 return;
             }
         }
+          // Проверка ФИО продавца
+        if (formData.name_of_seller) {
+            const fio_seller = formData.name_of_seller;
+            if (!fio_seller || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_seller)) {
+                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+                return;
+            }
+        }
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
             const fullName = formData.name_of_seller;
