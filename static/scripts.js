@@ -2,6 +2,28 @@ let selectedTemplate = '';
 
 const BASE_URL = 'http://127.0.0.1:5500';
 
+//функция для валидации
+function validateFormData(formData) {
+    // Проверка, что все поля заполнены
+    const allFieldsFilled = Object.values(formData).every(value => value.trim() !== "");
+    if (!allFieldsFilled) {
+        alert("Пожалуйста, заполните все поля формы.");
+        return false;
+    }
+
+    // Проверка корректности ФИО (если такие поля есть)
+    const fioFields = ['FIO', 'FIO_boss', 'FIO_dir', 'name_of_seller', 'name_of_buyer'];
+    for (const field of fioFields) {
+        if (formData[field] && !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(formData[field])) {
+            alert(`Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.`);
+            return false;
+        }
+    }
+
+    // Если все проверки пройдены
+    return true;
+}
+
 // Получаем все поля ввода в выпадающих списках
 const searchInputs = document.querySelectorAll('.dropdown-menu');
 
@@ -209,6 +231,8 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     });
 });
 
+
+//СКАЧАТЬ ДОК
 document.addEventListener('click', async (event) => {
     // Проверяем, что нажата кнопка "Сохранить данные"
     if (event.target && event.target.textContent.trim() === 'Скачать документ .docx') {
@@ -222,6 +246,12 @@ document.addEventListener('click', async (event) => {
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim(); // Используем id как ключи для данных
         });
+
+        // Валидация данных формы
+        if (!validateFormData(formData)) {
+            return;
+        }
+
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
             const fullName = formData.name_of_seller;
@@ -301,7 +331,71 @@ document.addEventListener('click', async (event) => {
                 alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
             }
         }
+
+//СЮДА ВСТАВИТЬ НАДО ПРИКАЗ else if(selectedTemplate == 'Приказ о начале разработки'){
+
+
+        else if(selectedTemplate == 'Распоряжение'){
+            if (formData.date_task) {
+                const [year, month, day] = formData.date_task.split("-");
+                formData.day_task = day;
+                formData.month_task = month;
+                formData.year_task = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+        if (formData.date_start) {
+                const [year, month, day] = formData.date_start.split("-");
+                formData.day_strat = day;
+                formData.month_strat = month;
+                formData.year_strat = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+        if (formData.date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day = day;
+                formData.month = month;
+                formData.year = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            try {
+                // Отправляем POST-запрос
+                const response = await fetch(`${BASE_URL}/generate_d/rasporyajenie.docx`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+                 // Проверяем ответ сервера
+                 if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
+                }
+                // Получаем сгенерированный файл
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'generated_document.docx'; // Название сохраняемого файла
+                a.click();
+
+                // Очищаем временный URL
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+               
+
+            }catch (error) {
+                console.error("Ошибка генерации документа:", error.message);
+                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
+            }
         
+
+        }
     }
 });
 
@@ -315,11 +409,10 @@ document.addEventListener("click", async (event) => {
         const form = event.target.closest("form"); // Находим текущую форму
         const formData = {};
 
-        // Проходимся по всем элементам формы и собираем данные
-        form.querySelectorAll("input").forEach(input => {
-            formData[input.id] = input.value.trim(); // Используем id как ключи для данных
-        });
-
+        // Валидация данных формы
+        if (!validateFormData(formData)) {
+            return;
+        }
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
             const fullName = formData.name_of_seller;
@@ -413,6 +506,12 @@ document.addEventListener("click", async (event) => {
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim();
         });
+
+        // Валидация данных формы
+        if (!validateFormData(formData)) {
+            return;
+        }
+
         if (selectedTemplate == 'Договор купли-продажи') {
             // Сохраняем полное имя продавца
             const fullName = formData.name_of_seller;
