@@ -330,9 +330,18 @@ document.addEventListener('click', async (event) => {
                 console.error("Ошибка генерации документа:", error.message);
                 alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
             }
-        }
+        } else if(selectedTemplate == 'Приказ о начале разработки'){
+            if (formData.date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day = day;
+                formData.month = month;
+                formData.year = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
 
-//СЮДА ВСТАВИТЬ НАДО ПРИКАЗ else if(selectedTemplate == 'Приказ о начале разработки'){
+//СЮДА ВСТАВИТЬ НАДО ПРИКАЗ 
 
 
         else if(selectedTemplate == 'Распоряжение'){
