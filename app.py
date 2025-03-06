@@ -110,4 +110,4 @@ def generate_preview():
     return send_file(generated_file, as_attachment=False)    
     
 if __name__ == '__main__':
-    app.run(debug=True,port=5500, threaded=False)
+    app.run(debug=True,port=5001, threaded=False)
