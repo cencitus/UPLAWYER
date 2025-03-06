@@ -367,7 +367,50 @@ document.addEventListener('click', async (event) => {
                 alert("Пожалуйста, заполните поле даты.");
                 return;
             }
-
+            formData.FIO = fullName_b;
+            const fullName_a = formData.FIO_dir;
+            if (fullName_b) {
+                const buyerNameParts = fullName_b.split(' ');
+                if (buyerNameParts.length === 3) {
+                    // Если имя состоит из Фамилия Имя Отчество
+                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
+                } else if (buyerNameParts.length === 2) {
+                    // Если имя состоит из Фамилия Имя
+                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
+                }
+            }
+            formData.FIO_dir = fullName_a;
+            try {
+                // Отправляем POST-запрос
+                const response = await fetch(`${BASE_URL}/generate_p/order.docx`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+    
+                // Проверяем ответ сервера
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
+                }
+    
+                // Получаем сгенерированный файл
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'generated_document.pdf'; // Название сохраняемого файла
+                a.click();
+    
+                // Очищаем временный URL
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+            } catch (error) {
+                console.error("Ошибка генерации документа:", error.message);
+                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
+            }
+        }
 //СЮДА ВСТАВИТЬ НАДО ПРИКАЗ 
 
 
