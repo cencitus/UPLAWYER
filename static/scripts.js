@@ -1,6 +1,6 @@
 let selectedTemplate = '';
 
-const BASE_URL = 'http://127.0.0.1:5500';
+const BASE_URL = 'http://127.0.0.1:5001';
 
 //функция для валидации
 function validateFormData(formData) {
@@ -336,6 +336,33 @@ document.addEventListener('click', async (event) => {
                 formData.day = day;
                 formData.month = month;
                 formData.year = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date_of_TD) {
+                const [year, month, day] = formData.date_of_TD.split("-");
+                formData.day_of_TD = day;
+                formData.month_of_TD = month;
+                formData.year_of_TD = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.term_date) {
+                const [year, month, day] = formData.term_date.split("-");
+                formData.term_day = day;
+                formData.term_month = month;
+                formData.term_year = year;
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date_task) {
+                const [year, month, day] = formData.date_task.split("-");
+                formData.day_task = day;
+                formData.month_task = month;
+                formData.year_task = year;
             } else {
                 alert("Пожалуйста, заполните поле даты.");
                 return;
