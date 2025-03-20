@@ -1,5 +1,3 @@
-let selectedTemplate = '';
-
 const BASE_URL = 'http://127.0.0.1:5500';
 
 let selectedTemplate = '';
@@ -409,12 +407,101 @@ document.addEventListener("click", async (event) => {
                 console.error("Ошибка генерации документа:", error.message);
                 alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
             }
+        } else if(selectedTemplate == 'Приказ о начале разработки'){
+            if (formData.date) {
+                const [year, month, day] = formData.date.split("-");
+                formData.day = day;
+                formData.month = month;
+                formData.year = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date_of_TD) {
+                const [year, month, day] = formData.date_of_TD.split("-");
+                formData.day_of_TD = day;
+                formData.month_of_TD = month;
+                formData.year_of_TD = year.slice(-1);
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.term_date) {
+                const [year, month, day] = formData.term_date.split("-");
+                formData.term_day = day;
+                formData.term_month = month;
+                formData.term_year = year;
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            if (formData.date_task) {
+                const [year, month, day] = formData.date_task.split("-");
+                formData.day_task = day;
+                formData.month_task = month;
+                formData.year_task = year;
+            } else {
+                alert("Пожалуйста, заполните поле даты.");
+                return;
+            }
+            const fullName_b = formData.FIO;
+            if (fullName_b) {
+                const buyerNameParts = fullName_b.split(' ');
+                if (buyerNameParts.length === 3) {
+                    // Если имя состоит из Фамилия Имя Отчество
+                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
+                } else if (buyerNameParts.length === 2) {
+                    // Если имя состоит из Фамилия Имя
+                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
+                }
+            }
+            formData.FIO = fullName_b;
+            const fullName_a = formData.FIO_dir;
+            if (fullName_b) {
+                const buyerNameParts = fullName_b.split(' ');
+                if (buyerNameParts.length === 3) {
+                    // Если имя состоит из Фамилия Имя Отчество
+                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
+                } else if (buyerNameParts.length === 2) {
+                    // Если имя состоит из Фамилия Имя
+                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
+                }
+            }
+            formData.FIO_dir = fullName_a;
+            try {
+                // Отправляем POST-запрос
+                const response = await fetch(`${BASE_URL}/generate_d/order.docx`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                // Проверяем ответ сервера
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
+                }
+
+                // Получаем сгенерированный файл
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'generated_document.docx'; // Название сохраняемого файла
+                a.click();
+
+                // Очищаем временный URL
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+            } catch (error) {
+                console.error("Ошибка генерации документа:", error.message);
+                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
+            }
         }
-
-//СЮДА ВСТАВИТЬ НАДО ПРИКАЗ else if(selectedTemplate == 'Приказ о начале разработки'){
-
-
+        
         else if(selectedTemplate == 'Распоряжение'){
+
             if (formData.date_task) {
                 const [year, month, day] = formData.date_task.split("-");
                 formData.day_task = day;
