@@ -16,7 +16,7 @@ a {
     font-family: "Poppins", sans-serif;
     color: black; 
     text-decoration: none; 
-    font-weight: 600;
+    font-weight: 700;
     font-size: 14px;
     margin-right: 30px;
 }
@@ -25,6 +25,7 @@ a:hover {
     color: #e5322d; 
     text-decoration: none; 
 }
+
 
 .logoHref {
     margin-right: 40px;
@@ -49,6 +50,7 @@ a:hover {
     font-weight: 600;
     font-family: "Poppins", sans-serif;
 }
+
 .choose-text {
     font-size: 18px;
     font-weight: 500;
@@ -60,13 +62,13 @@ a:hover {
     border: 1px solid #63686d; 
     color: #63686d; 
     transition: all 0.3s ease; 
-    margin-right: 1%;
-}
+  }
   
 .btn:hover {
-    background-color: #63686d; 
-    color: #ffffff; 
+background-color: #63686d; 
+color: #ffffff; 
 }
+
 
 .dropdown-menu {
     background-color: #ffffff; 
@@ -90,16 +92,33 @@ a:hover {
 }
 
 
+/* Убираем рамку у строки поиска */
+.search-input {
+    border: none; 
+    margin: 0.5rem 0; 
+    padding: 0.5rem 1rem; 
+    width: 100%;
+    box-sizing: border-box; 
+}
+.search-input:focus {
+    outline: none; /* Убираем стандартное выделение */
+  }
 
+#search-results {
+    max-height: 200px; /* Ограничение высоты */
+    overflow-y: auto; /* Прокрутка, если контент превышает высоту */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Тень как у выпадающего списка */
+  }
 
+#search-results .dropdown-item:focus {
+    outline: none; /* Убираем рамку */
+    box-shadow: none; /* Убираем эффект тени, если есть */
+}
 
-
-
-
-
-
-
-
+.form-control:focus {
+    box-shadow: none !important;
+    border-color: #ccc !important; /* Вернуть к обычной рамке */
+}
 
 .my-6 {
     padding-bottom: 1px;
@@ -115,6 +134,17 @@ a:hover {
     margin-bottom: 5px !important;
 }
 
+.fileButton {
+    border: 0px;
+    background-color: transparent;
+    margin: 15px 0 0 15px;
+}
+.fileButton:hover {
+    border: 0px;
+    background-color: transparent;
+    margin: 15px 0 0 15px;
+    color: #e5322d; 
+}
 
 @media (max-width: 1000px) {
     .my-6{
