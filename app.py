@@ -6,6 +6,7 @@ import traceback
 import os
 from docx2pdf import convert
 
+
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5500"}})
 
@@ -24,7 +25,7 @@ def apply_styles_to_paragraph(paragraph):
         font.size = Pt(DEFAULT_FONT_SIZE)
         font.color.rgb = DEFAULT_FONT_COLOR
 
-@app.route('/generated/<name_of_doc>', methods=['POST'])
+@app.route('/generate_d/<name_of_doc>', methods=['POST'])
 def generate_docx_document(name_of_doc):
     try:
         # Получаем данные из запроса
@@ -76,7 +77,7 @@ def generate_pdf_document(name_of_doc):
 
         # Загружаем шаблон
         doc = Document(template_path)
-        
+
         # Заменяем плейсхолдеры в тексте
         for paragraph in doc.paragraphs:
             for key, value in data.items():
@@ -92,7 +93,8 @@ def generate_pdf_document(name_of_doc):
         output_pdf_path = 'generated_document.pdf'
         convert("temp_document.docx", "generated_document.pdf")
         return send_file(output_pdf_path, as_attachment=True, download_name='generated_document.pdf')
-    
+
+
     except Exception as e:
         # Логируем ошибку в консоль
         app.logger.error(f"Ошибка: {e}")
@@ -107,7 +109,8 @@ def generate_preview():
     generated_file = generate_pdf_document(data)  # Функция, которая генерирует документ
 
     # Возвращаем сгенерированный файл
-    return send_file(generated_file, as_attachment=False)    
-    
+    return send_file(generated_file, as_attachment=False)
+
+
 if __name__ == '__main__':
-    app.run(debug=True,port=5001, threaded=False)
+    app.run(debug=True,port=5500, threaded=False)
