@@ -410,11 +410,7 @@ document.addEventListener('click', async (event) => {
                 console.error("Ошибка генерации документа:", error.message);
                 alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
             }
-        }
-//СЮДА ВСТАВИТЬ НАДО ПРИКАЗ 
-
-
-        else if(selectedTemplate == 'Распоряжение'){
+        } else if(selectedTemplate == 'Распоряжение'){
             if (formData.date_task) {
                 const [year, month, day] = formData.date_task.split("-");
                 formData.day_task = day;
