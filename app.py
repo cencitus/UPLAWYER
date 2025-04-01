@@ -7,14 +7,18 @@ from docx import Document
 from docx.shared import Pt, RGBColor
 import traceback
 import os
+from datetime import datetime
 from docx2pdf import convert
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sava2316@localhost/dbname'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sava2316@localhost/uplawyer_bd'
 app.config['SECRET_KEY'] = 'your-secret-key-here'
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
-CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5500"}})
+CORS(app, 
+    resources={r"/*": {"origins": "http://127.0.0.1:5500"}},
+    supports_credentials=True  # Разрешаем передачу кук
+)
 
 DEFAULT_FONT_NAME = "Times New Roman"
 DEFAULT_FONT_SIZE = 12
@@ -22,16 +26,20 @@ DEFAULT_FONT_COLOR = RGBColor(0, 0, 0)
 
 # Модели
 class User(UserMixin, db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True)
     email = db.Column(db.String(100), unique=True)
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(512))
+    documents = db.relationship('DocumentHistory', backref='user', lazy=True)
 
 class DocumentHistory(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    template_name = db.Column(db.String(100))
-    generated_at = db.Column(db.DateTime, default=datetime.utcnow)
+   __tablename__ = 'document_history'  # Явно указываем имя таблицы
+   id = db.Column(db.Integer, primary_key=True)
+   user_id = db.Column(db.Integer, db.ForeignKey('users.id'))  # Ссылаемся на таблицу users
+   template_name = db.Column(db.String(100))
+   generated_at = db.Column(db.DateTime, default=datetime.utcnow)
+   download_link = db.Column(db.String(255))
 
 def apply_styles_to_paragraph(paragraph):
     for run in paragraph.runs:
@@ -145,6 +153,55 @@ def generate_pdf_document(name_of_doc):
         app.logger.error(f"Ошибка: {e}")
         app.logger.error(traceback.format_exc())
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# Регистрация
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.json
+    hashed_password = generate_password_hash(data['password'])
+    new_user = User(username=data['username'], email=data['email'], password_hash=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "User created"}), 201
+
+# Вход
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = User.query.filter_by(username=data['username']).first()
+    
+    if user and check_password_hash(user.password_hash, data['password']):
+        login_user(user, remember=True)  # Добавляем remember=True
+        return jsonify({
+            "message": "Logged in successfully",
+            "user": user.username,
+            "id": user.id
+        }), 200
+    return jsonify({"error": "Invalid credentials"}), 401
+
+# Выход
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return jsonify({"message": "Logged out"}), 200
+
+# История документов
+@app.route('/history')
+@login_required
+def get_history():
+    history = DocumentHistory.query.filter_by(user_id=current_user.id).all()
+    return jsonify([{
+        'template_name': item.template_name,
+        'generated_at': item.generated_at
+    } for item in history])
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5500, threaded=False)

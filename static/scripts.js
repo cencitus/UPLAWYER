@@ -1177,3 +1177,188 @@ document.addEventListener("click", async (event) => {
         }
     }
 });
+
+
+
+// Добавим глобальные переменные
+let currentUser = null;
+const authButton = document.querySelector('.authorize');
+
+// Функции для работы с аутентификацией
+async function login(username, password) {
+    try {
+        const response = await fetch(`${BASE_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        
+        if (response.ok) {
+            currentUser = await response.json();
+            updateAuthUI();
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Login error:', error);
+        return false;
+    }
+}
+
+async function register(username, email, password) {
+    try {
+        const response = await fetch(`${BASE_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
+        });
+        return response.ok;
+    } catch (error) {
+        console.error('Registration error:', error);
+        return false;
+    }
+}
+
+// Функция обновления интерфейса
+function updateAuthUI(user) {
+    const loginBtn = document.getElementById('loginBtn');
+    const userBlock = document.getElementById('userBlock');
+    const usernameDisplay = document.getElementById('usernameDisplay');
+    
+    if (user) {
+      // Показываем блок пользователя
+      loginBtn.classList.add('d-none');
+      userBlock.classList.remove('d-none');
+      usernameDisplay.textContent = user.username;
+    } else {
+      // Показываем кнопку входа
+      loginBtn.classList.remove('d-none');
+      userBlock.classList.add('d-none');
+    }
+  }
+  
+  // Обработчик успешного входа
+  function handleSuccessfulLogin(userData) {
+    // Закрываем модальное окно
+    const modal = bootstrap.Modal.getInstance(document.getElementById('authModal'));
+    modal.hide();
+    
+    // Обновляем интерфейс
+    updateAuthUI(userData.user);
+    
+    // Сохраняем данные в localStorage
+    localStorage.setItem('currentUser', JSON.stringify(userData.user));
+    
+    // Можно добавить дополнительные действия
+    console.log('Пользователь вошел:', userData.user);
+  }
+  
+  // Проверка при загрузке страницы
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      updateAuthUI(JSON.parse(savedUser));
+    }
+  });
+  
+  // Обработчик выхода
+  document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('currentUser');
+    updateAuthUI(null);
+    alert('Вы вышли из системы');
+  });
+  
+  // Модифицируем ваш обработчик входа:
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    try {
+      const form = e.target;
+      const username = form.querySelector('[name="username"]').value;
+      const password = form.querySelector('[name="password"]').value;
+  
+      const response = await fetch(`${BASE_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+        credentials: 'include'
+      });
+  
+      const data = await response.json();
+      
+      if (response.ok) {
+        handleSuccessfulLogin(data);
+      } else {
+        alert(data.error || 'Ошибка входа');
+      }
+    } catch (error) {
+      console.error('Ошибка:', error);
+      alert('Произошла ошибка: ' + error.message);
+    }
+  });
+
+// Обработчики форм
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    try {
+        const form = e.target;
+        
+        // Проверяем существование элементов
+        const usernameInput = form.querySelector('input[name="username"]');
+        const passwordInput = form.querySelector('input[name="password"]');
+        
+        if (!usernameInput || !passwordInput) {
+            console.error('Не найдены поля ввода!');
+            alert('Ошибка формы: отсутствуют необходимые поля');
+            return;
+        }
+        
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (!username || !password) {
+            alert('Заполните все поля');
+            return;
+        }
+
+        console.log('Отправка данных:', { username, password });
+        const response = await fetch(`${BASE_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Ошибка сервера');
+        }
+
+        const data = await response.json();
+        $('#authModal').modal('hide');
+        alert(`Добро пожаловать, ${data.user?.username || 'пользователь'}!`);
+        
+    } catch (error) {
+        console.error('Ошибка входа:', error);
+        alert(error.message || 'Произошла ошибка при входе');
+    }
+});
+
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = e.target.elements[0].value;
+    const email = e.target.elements[1].value;
+    const password = e.target.elements[2].value;
+    
+    if (await register(username, email, password)) {
+        alert('Регистрация успешна! Теперь войдите.');
+        $('#authTabs a[href="#login"]').tab('show');
+    } else {
+        alert('Ошибка регистрации');
+    }
+});
+
+// Инициализация
+updateAuthUI();
