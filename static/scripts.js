@@ -1465,6 +1465,7 @@ function renderHistory(items) {
   
     tbody.innerHTML = items.map(item => `
       <tr>
+        <td>${item.document_name || 'Документ'}</td>
         <td>${item.template_name || 'Без названия'}</td>
         <td>${new Date(item.generated_at).toLocaleString()}</td>
         <td>

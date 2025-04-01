@@ -7,8 +7,9 @@ from docx import Document
 from docx.shared import Pt, RGBColor
 import traceback
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from docx2pdf import convert
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sava2316@localhost/uplawyer_bd'
@@ -40,6 +41,7 @@ class DocumentHistory(db.Model):
     template_name = db.Column(db.String(100))
     generated_at = db.Column(db.DateTime, default=datetime.utcnow)
     download_link = db.Column(db.String(255))
+    document_name = db.Column(db.String(100))  # Новое поле для уникального имени
 
 def apply_styles_to_paragraph(paragraph):
     for run in paragraph.runs:
@@ -91,6 +93,13 @@ def generate_docx_document():
         app.logger.error(traceback.format_exc())
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
 
+def generate_document_name(template_name, data):
+    date_str = datetime.now().strftime("%d.%m.%Y")
+    if template_name == "purchase&sale_agreement.docx":
+        return f"ДКП {data.get('name_of_seller', '')} - {data.get('name_of_buyer', '')} {date_str}"
+    else:
+        return f"{template_name} {date_str}"
+
 # Старый обработчик (оставлен для совместимости)
 @app.route('/generate_d/<name_of_doc>', methods=['POST'])
 def generate_docx_document_with_path(name_of_doc):
@@ -116,6 +125,7 @@ def generate_docx_document_with_path(name_of_doc):
         doc.save(output_path)
         doc_history = DocumentHistory(
             user_id=current_user.id,
+            document_name = generate_document_name(name_of_doc, data),
             template_name=name_of_doc,
             download_link=f"/downloads/{output_path}"  # или полный URL
         )
@@ -157,6 +167,7 @@ def generate_pdf_document(name_of_doc):
 
         doc_history = DocumentHistory(
             user_id=current_user.id,
+            document_name = generate_document_name(name_of_doc, data),
             template_name=name_of_doc,
             download_link=f"/downloads/{output_pdf_path}"  # или полный URL
         )
@@ -221,8 +232,11 @@ def get_history():
         return jsonify([{
             'id': item.id,
             'template_name': item.template_name,
-            'generated_at': item.generated_at.isoformat(),
-            'download_link': item.download_link
+            'generated_at': item.generated_at.replace(tzinfo=timezone.utc)
+                             .astimezone(tz=None)  # Конвертирует в локальный пояс
+                             .strftime('%d.%m.%Y %H:%M'),
+            'download_link': item.download_link,
+            'document_name': item.document_name
         } for item in history])
     
     except Exception as e:
