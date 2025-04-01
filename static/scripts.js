@@ -379,7 +379,7 @@ document.addEventListener("click", async (event) => {
 
             try {
                 // Отправляем POST-запрос
-                const response = await fetch(`${BASE_URL}/generate_d/purchase%26sale_agreement.docx`, {
+                const response = await fetch(`${BASE_URL}/generate_d/purchase&sale_agreement.docx`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
