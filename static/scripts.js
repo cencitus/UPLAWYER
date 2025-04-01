@@ -379,7 +379,7 @@ document.addEventListener("click", async (event) => {
 
             try {
                 // Отправляем POST-запрос
-                const response = await fetch(`${BASE_URL}/generate_d/purchase%26sale_agreement.docx`, {
+                const response = await fetch(`${BASE_URL}/generate_d/purchase&sale_agreement.docx`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -867,6 +867,11 @@ document.addEventListener("click", async (event) => {
 
         // Собираем данные из формы
         const form = event.target.closest("form");
+        const button = event.target;
+        
+        // Показываем лоадер
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Генерация...';
 
         const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
         if (!allFieldsFilled) {
@@ -1001,6 +1006,10 @@ document.addEventListener("click", async (event) => {
             } catch (error) {
                 console.error("Ошибка генерации документа:", error.message);
                 alert("Произошла ошибка при генерации документа.");
+            } finally {
+                // Восстанавливаем кнопку
+                button.disabled = false;
+                button.textContent = 'Создать документ';
             }
         }else if(selectedTemplate == 'Приказ о начале разработки'){
             if (formData.date) {
