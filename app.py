@@ -34,12 +34,12 @@ class User(UserMixin, db.Model):
     documents = db.relationship('DocumentHistory', backref='user', lazy=True)
 
 class DocumentHistory(db.Model):
-   __tablename__ = 'document_history'  # Явно указываем имя таблицы
-   id = db.Column(db.Integer, primary_key=True)
-   user_id = db.Column(db.Integer, db.ForeignKey('users.id'))  # Ссылаемся на таблицу users
-   template_name = db.Column(db.String(100))
-   generated_at = db.Column(db.DateTime, default=datetime.utcnow)
-   download_link = db.Column(db.String(255))
+    __tablename__ = 'document_history'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    template_name = db.Column(db.String(100))
+    generated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    download_link = db.Column(db.String(255))
 
 def apply_styles_to_paragraph(paragraph):
     for run in paragraph.runs:
@@ -114,6 +114,13 @@ def generate_docx_document_with_path(name_of_doc):
 
         output_path = 'generated_document.docx'
         doc.save(output_path)
+        doc_history = DocumentHistory(
+            user_id=current_user.id,
+            template_name=name_of_doc,
+            download_link=f"/downloads/{output_path}"  # или полный URL
+        )
+        db.session.add(doc_history)
+        db.session.commit()
 
         return send_file(output_path, as_attachment=True, download_name='generated_document.docx')
 
@@ -147,8 +154,19 @@ def generate_pdf_document(name_of_doc):
 
         output_pdf_path = 'generated_document.pdf'
         convert("temp_document.docx", "generated_document.pdf")
-        return send_file(output_pdf_path, as_attachment=True, download_name='generated_document.pdf')
 
+        doc_history = DocumentHistory(
+            user_id=current_user.id,
+            template_name=name_of_doc,
+            download_link=f"/downloads/{output_pdf_path}"  # или полный URL
+        )
+        db.session.add(doc_history)
+        db.session.commit()
+
+
+        return send_file(output_pdf_path, as_attachment=True, download_name='generated_document.pdf')
+    
+        
     except Exception as e:
         app.logger.error(f"Ошибка: {e}")
         app.logger.error(traceback.format_exc())
@@ -190,17 +208,50 @@ def logout():
     logout_user()
     return jsonify({"message": "Logged out"}), 200
 
-# История документов
-@app.route('/history')
+@app.route('/api/history', methods=['GET'])
 @login_required
 def get_history():
-    history = DocumentHistory.query.filter_by(user_id=current_user.id).all()
-    return jsonify([{
-        'template_name': item.template_name,
-        'generated_at': item.generated_at
-    } for item in history])
+    try:
+        history = DocumentHistory.query.filter_by(
+            user_id=current_user.id
+        ).order_by(
+            DocumentHistory.generated_at.desc()
+        ).all()
+        
+        return jsonify([{
+            'id': item.id,
+            'template_name': item.template_name,
+            'generated_at': item.generated_at.isoformat(),
+            'download_link': item.download_link
+        } for item in history])
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/history/<int:doc_id>', methods=['DELETE'])
+@login_required
+def delete_history_item(doc_id):
+    item = DocumentHistory.query.filter_by(id=doc_id, user_id=current_user.id).first()
+    if not item:
+        return jsonify({"error": "Document not found"}), 404
+    
+    db.session.delete(item)
+    db.session.commit()
+    return jsonify({"message": "Deleted"}), 200
 
 
+@app.route('/api/check-auth')
+def check_auth():
+    if current_user.is_authenticated:
+        return jsonify({
+            'authenticated': True,
+            'user': {
+                'id': current_user.id,
+                'username': current_user.username,
+                'email': current_user.email
+            }
+        })
+    return jsonify({'authenticated': False})
 
 
 if __name__ == '__main__':

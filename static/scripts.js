@@ -1219,26 +1219,66 @@ async function register(username, email, password) {
     }
 }
 
-// Функция обновления интерфейса
+
+
+async function handleLogout(e) {
+    e.preventDefault();
+    
+    try {
+        const response = await fetch(`${BASE_URL}/api/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            localStorage.removeItem('currentUser');
+            updateAuthUI(null);
+            showToast('Вы успешно вышли из системы');
+        } else {
+            throw new Error('Ошибка при выходе');
+        }
+    } catch (error) {
+        console.error('Ошибка выхода:', error);
+        showToast(error.message, 'error');
+    }
+}
+
+// Функция для обновления интерфейса аутентификации
 function updateAuthUI(user) {
     const loginBtn = document.getElementById('loginBtn');
     const userBlock = document.getElementById('userBlock');
     const usernameDisplay = document.getElementById('usernameDisplay');
+    const historyBtn = document.getElementById('historyBtn');
     
     if (user) {
-      // Показываем блок пользователя
-      loginBtn.classList.add('d-none');
-      userBlock.classList.remove('d-none');
-      usernameDisplay.textContent = user.username;
+        // Показываем блок пользователя
+        if (loginBtn) loginBtn.classList.add('d-none');
+        if (userBlock) userBlock.classList.remove('d-none');
+        if (usernameDisplay) usernameDisplay.textContent = user.username;
+        
+        // Создаем кнопку истории, если ее нет
+        if (!historyBtn) {
+            const historyButton = document.createElement('button');
+            historyButton.id = 'historyBtn';
+            historyButton.className = 'btn btn-outline-primary me-2';
+            historyButton.innerHTML = '<i class="bi bi-clock-history"></i> История';
+            historyButton.addEventListener('click', () => {
+                const modal = new bootstrap.Modal(document.getElementById('historyModal'));
+                modal.show();
+                loadHistory();
+            });
+            authButton.insertBefore(historyButton, authButton.firstChild);
+        }
     } else {
-      // Показываем кнопку входа
-      loginBtn.classList.remove('d-none');
-      userBlock.classList.add('d-none');
+        // Показываем кнопку входа
+        if (loginBtn) loginBtn.classList.remove('d-none');
+        if (userBlock) userBlock.classList.add('d-none');
+        if (historyBtn) historyBtn.remove();
     }
-  }
-  
-  // Обработчик успешного входа
-  function handleSuccessfulLogin(userData) {
+}
+
+// Обработчик успешного входа
+function handleSuccessfulLogin(userData) {
     // Закрываем модальное окно
     const modal = bootstrap.Modal.getInstance(document.getElementById('authModal'));
     modal.hide();
@@ -1246,13 +1286,34 @@ function updateAuthUI(user) {
     // Обновляем интерфейс
     updateAuthUI(userData.user);
     
-    // Сохраняем данные в localStorage
+    // Сохраняем данные
     localStorage.setItem('currentUser', JSON.stringify(userData.user));
     
-    // Можно добавить дополнительные действия
+    // Показываем уведомление
+    showToast(`Добро пожаловать, ${userData.user.username}!`);
+    
+    // Дополнительные действия
     console.log('Пользователь вошел:', userData.user);
-  }
-  
+    updateDocumentHistoryBadge(); // Обновляем бейдж с количеством документов
+}
+
+// Функция для обновления бейджа истории
+function updateDocumentHistoryBadge() {
+    fetch(`${BASE_URL}/api/history/count`, {
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        const badge = document.createElement('span');
+        badge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger';
+        badge.textContent = data.count;
+        
+        const historyBtn = document.getElementById('historyBtn');
+        historyBtn.classList.add('position-relative');
+        historyBtn.appendChild(badge);
+    })
+    .catch(console.error);
+}
   // Проверка при загрузке страницы
   document.addEventListener('DOMContentLoaded', () => {
     const savedUser = localStorage.getItem('currentUser');
@@ -1359,6 +1420,122 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         alert('Ошибка регистрации');
     }
 });
+
+
+// Загрузка истории
+// Функция загрузки истории документов
+async function loadHistory() {
+    try {
+        const response = await fetch(`${BASE_URL}/api/history`, {
+            credentials: 'include' // Важно для кук авторизации
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ошибка: ${response.status}`);
+        }
+
+        const history = await response.json();
+        
+        if (!Array.isArray(history)) {
+            throw new Error("Некорректный формат данных");
+        }
+
+        console.log("Получена история:", history); // Для отладки
+        
+        renderHistory(history);
+
+    } catch (error) {
+        console.error("Ошибка загрузки истории:", error);
+        alert("Не удалось загрузить историю. Проверьте консоль для деталей.");
+    }
+}
+
+
+function renderHistory(items) {
+    const tbody = document.getElementById('historyTableBody');
+    
+    if (!items || items.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="3" class="text-center py-4">Нет данных</td>
+        </tr>
+      `;
+      return;
+    }
+  
+    tbody.innerHTML = items.map(item => `
+      <tr>
+        <td>${item.template_name || 'Без названия'}</td>
+        <td>${new Date(item.generated_at).toLocaleString()}</td>
+        <td>
+          <a href="${item.download_link}" class="btn btn-sm btn-primary" download>
+            Скачать
+          </a>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+// Функция удаления элемента истории
+async function deleteHistoryItem(id) {
+    try {
+        const response = await fetch(`${BASE_URL}/api/history/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        
+        if (!response.ok) throw new Error('Ошибка удаления');
+        
+        showToast('Документ удалён из истории');
+        await loadHistory(); // Перезагружаем историю
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showToast(error.message, 'error');
+    }
+}
+
+
+// Функция для показа уведомлений
+function showToast(message, type = 'success') {
+    // Реализация toast-уведомлений (можно использовать библиотеку или создать свои)
+    alert(message); // Временное решение - можно заменить на красивый toast
+}
+
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    // Проверяем авторизацию
+    fetch(`${BASE_URL}/api/check-auth`, {
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.authenticated) {
+            updateAuthUI(data.user);
+        }
+    })
+    .catch(console.error);
+    
+    // Обработчик выхода
+    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch(`${BASE_URL}/logout`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                updateAuthUI(null);
+                showToast('Вы успешно вышли из системы');
+            }
+        } catch (error) {
+            console.error('Ошибка выхода:', error);
+            showToast('Ошибка при выходе', 'error');
+        }
+    });
+});
+
 
 // Инициализация
 updateAuthUI();
