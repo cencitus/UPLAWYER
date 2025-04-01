@@ -1,3 +1,6 @@
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask import Flask, request, send_file, jsonify, send_from_directory
 from flask_cors import CORS
 from docx import Document
@@ -7,11 +10,28 @@ import os
 from docx2pdf import convert
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sava2316@localhost/dbname'
+app.config['SECRET_KEY'] = 'your-secret-key-here'
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
 CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5500"}})
 
 DEFAULT_FONT_NAME = "Times New Roman"
 DEFAULT_FONT_SIZE = 12
 DEFAULT_FONT_COLOR = RGBColor(0, 0, 0)
+
+# Модели
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True)
+    email = db.Column(db.String(100), unique=True)
+    password_hash = db.Column(db.String(128))
+
+class DocumentHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    template_name = db.Column(db.String(100))
+    generated_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 def apply_styles_to_paragraph(paragraph):
     for run in paragraph.runs:
