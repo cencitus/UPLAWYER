@@ -61,6 +61,7 @@ searchInput.addEventListener('focus', function () {
 
 // Блок для отображения содержимого
 const contentDiv = document.getElementById('qwerty');
+const originalContent = document.getElementById('qwerty').innerHTML;
 
 function handleDocumentSelection(event) {
     // Проверяем, был ли клик по элементу .dropdown-item
@@ -131,7 +132,7 @@ function handleDocumentSelection(event) {
             contentDiv.appendChild(form); // Добавляем форму в контейнер
           } else {
             // Если данных для типа документа нет
-            contentDiv.innerHTML = `<p>Для выбранного типа документа нет данных для отображения.</p>`;
+            contentDiv.innerHTML = originalContent;
         }
     }
 }
