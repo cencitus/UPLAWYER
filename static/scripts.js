@@ -61,7 +61,6 @@ searchInput.addEventListener('focus', function () {
 
 // Блок для отображения содержимого
 const contentDiv = document.getElementById('qwerty');
-const originalContent = document.getElementById('qwerty').innerHTML;
 
 function handleDocumentSelection(event) {
     // Проверяем, был ли клик по элементу .dropdown-item
@@ -132,7 +131,7 @@ function handleDocumentSelection(event) {
             contentDiv.appendChild(form); // Добавляем форму в контейнер
           } else {
             // Если данных для типа документа нет
-            contentDiv.innerHTML = originalContent;
+            contentDiv.innerHTML = `<p>Для выбранного типа документа нет данных для отображения.</p>`;
         }
     }
 }
@@ -1244,39 +1243,32 @@ async function handleLogout(e) {
     }
 }
 
-// Функция для обновления интерфейса аутентификации
+
+// В функции updateAuthUI (которую вызываем после входа/выхода)
 function updateAuthUI(user) {
     const loginBtn = document.getElementById('loginBtn');
     const userBlock = document.getElementById('userBlock');
-    const usernameDisplay = document.getElementById('usernameDisplay');
     const historyBtn = document.getElementById('historyBtn');
-    
+    const usernameDisplay = document.getElementById('usernameDisplay');
+  
     if (user) {
-        // Показываем блок пользователя
-        if (loginBtn) loginBtn.classList.add('d-none');
-        if (userBlock) userBlock.classList.remove('d-none');
-        if (usernameDisplay) usernameDisplay.textContent = user.username;
-        
-        // Создаем кнопку истории, если ее нет
-        if (!historyBtn) {
-            const historyButton = document.createElement('button');
-            historyButton.id = 'historyBtn';
-            historyButton.className = 'btn btn-outline-primary me-2';
-            historyButton.innerHTML = '<i class="bi bi-clock-history"></i> История';
-            historyButton.addEventListener('click', () => {
-                const modal = new bootstrap.Modal(document.getElementById('historyModal'));
-                modal.show();
-                loadHistory();
-            });
-            authButton.insertBefore(historyButton, authButton.firstChild);
-        }
+      loginBtn.classList.add('d-none');
+      userBlock.classList.remove('d-none');
+      historyBtn.classList.remove('d-none');
+      usernameDisplay.textContent = user.username;
     } else {
-        // Показываем кнопку входа
-        if (loginBtn) loginBtn.classList.remove('d-none');
-        if (userBlock) userBlock.classList.add('d-none');
-        if (historyBtn) historyBtn.remove();
+      loginBtn.classList.remove('d-none');
+      userBlock.classList.add('d-none');
+      historyBtn.classList.add('d-none');
     }
-}
+  }
+  
+  // Обработчик кнопки "История"
+  document.getElementById('historyBtn')?.addEventListener('click', () => {
+    const historyModal = new bootstrap.Modal(document.getElementById('historyModal'));
+    historyModal.show();
+    loadHistory(); // Ваша существующая функция загрузки истории
+  });
 
 // Обработчик успешного входа
 function handleSuccessfulLogin(userData) {

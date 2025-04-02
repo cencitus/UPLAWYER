@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Шапка сайта</title>
+  <link rel="icon" href="logo-transparent.png" type="image/png">
+  <title>UPLAWYER</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.document.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,34 +15,30 @@
 <body>
     <!-- Шапка -->
     <div class="top-header bg-white">
-        <div class="container d-flex align-items-center">
-            <!-- Логотип -->
-            <a href="create_document.html" class="logoHref">
-                <img src="logo.png" class="logo-image" alt="Логотип">
-            </a>
-
-            <!-- Кнопка "Создать документ" -->
-            <a href="create_document.html">СОЗДАТЬ ДОКУМЕНТ</a>
-      
-            <!-- Кнопки справа -->
-            <div class="authorize ms-auto">
-              <div id="authBlock">
-                <!-- Гость (по умолчанию) -->
-                <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#authModal" id="loginBtn">
-                  Войти
-                </button>
-                
-                <!-- Авторизованный пользователь (скрыто) -->
-                <div class="dropdown d-none" id="userBlock">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <span id="usernameDisplay"></span>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" id="logoutBtn">Выйти</a></li>
-                  </ul>
-                </div>
-              </div>
+      <div class="container d-flex align-items-center">
+        <!-- Логотип -->
+        <a href="create_document.html" class="logoHref">
+          <img src="logo-transparent.png" class="logo-image" alt="Логотип">
+        </a>
+    
+        <!-- Основные ссылки -->
+        <a href="#" class="nav-link ms-4" id="createDocLink">СОЗДАТЬ ДОКУМЕНТ</a>
+        <button class="nav-link ms-3 border-0 bg-transparent d-none" id="historyBtn" style="font-weight: 700;">ИСТОРИЯ</button>
+    
+        <!-- Блок авторизации -->
+        <div class="authorize ms-auto">
+          <div id="authBlock">
+            <!-- Гость -->
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#authModal" id="loginBtn">
+              Войти
+            </button>
+            
+            <!-- Авторизованный пользователь -->
+            <div class="d-none align-items-center" id="userBlock">
+              <span class="me-3" id="usernameDisplay"></span>
+              <button class="btn btn-outline-danger btn-sm" id="logoutBtn">Выйти</button>
             </div>
+          </div>
         </div>
       </div>
     </div>
