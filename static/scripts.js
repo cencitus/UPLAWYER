@@ -76,7 +76,7 @@ function handleDocumentSelection(event) {
         // Проверяем, есть ли данные для выбранного типа документа
         if (documentFields[type]) {
             const fields = documentFields[type];
-            
+          
             // Создаем форму
             const form = document.createElement('form');
             //form.classList.add('document-form', 'p-4', 'bg-light', 'rounded', 'shadow-sm'); // Добавляем стили
@@ -379,7 +379,7 @@ document.addEventListener("click", async (event) => {
 
             try {
                 // Отправляем POST-запрос
-                const response = await fetch(`${BASE_URL}/generate_d/purchase%26sale_agreement.docx`, {
+                const response = await fetch(`${BASE_URL}/generate_d/purchase&sale_agreement.docx`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -564,6 +564,8 @@ document.addEventListener("click", async (event) => {
         
     }
 });
+
+
 
 document.addEventListener("click", async (event) => {
     // Проверяем, что нажата кнопка "Сохранить данные"
@@ -865,6 +867,11 @@ document.addEventListener("click", async (event) => {
 
         // Собираем данные из формы
         const form = event.target.closest("form");
+        const button = event.target;
+        
+        // Показываем лоадер
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Генерация...';
 
         const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
         if (!allFieldsFilled) {
@@ -999,6 +1006,10 @@ document.addEventListener("click", async (event) => {
             } catch (error) {
                 console.error("Ошибка генерации документа:", error.message);
                 alert("Произошла ошибка при генерации документа.");
+            } finally {
+                // Восстанавливаем кнопку
+                button.disabled = false;
+                button.textContent = 'Создать документ';
             }
         }else if(selectedTemplate == 'Приказ о начале разработки'){
             if (formData.date) {
@@ -1166,3 +1177,356 @@ document.addEventListener("click", async (event) => {
         }
     }
 });
+
+
+
+// Добавим глобальные переменные
+let currentUser = null;
+const authButton = document.querySelector('.authorize');
+
+// Функции для работы с аутентификацией
+async function login(username, password) {
+    try {
+        const response = await fetch(`${BASE_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        
+        if (response.ok) {
+            currentUser = await response.json();
+            updateAuthUI();
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Login error:', error);
+        return false;
+    }
+}
+
+async function register(username, email, password) {
+    try {
+        const response = await fetch(`${BASE_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
+        });
+        return response.ok;
+    } catch (error) {
+        console.error('Registration error:', error);
+        return false;
+    }
+}
+
+
+
+async function handleLogout(e) {
+    e.preventDefault();
+    
+    try {
+        const response = await fetch(`${BASE_URL}/api/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            localStorage.removeItem('currentUser');
+            updateAuthUI(null);
+            showToast('Вы успешно вышли из системы');
+        } else {
+            throw new Error('Ошибка при выходе');
+        }
+    } catch (error) {
+        console.error('Ошибка выхода:', error);
+        showToast(error.message, 'error');
+    }
+}
+
+
+// В функции updateAuthUI (которую вызываем после входа/выхода)
+function updateAuthUI(user) {
+    const loginBtn = document.getElementById('loginBtn');
+    const userBlock = document.getElementById('userBlock');
+    const historyBtn = document.getElementById('historyBtn');
+    const usernameDisplay = document.getElementById('usernameDisplay');
+  
+    if (user) {
+      loginBtn.classList.add('d-none');
+      userBlock.classList.remove('d-none');
+      historyBtn.classList.remove('d-none');
+      usernameDisplay.textContent = user.username;
+    } else {
+      loginBtn.classList.remove('d-none');
+      userBlock.classList.add('d-none');
+      historyBtn.classList.add('d-none');
+    }
+  }
+  
+  // Обработчик кнопки "История"
+  document.getElementById('historyBtn')?.addEventListener('click', () => {
+    const historyModal = new bootstrap.Modal(document.getElementById('historyModal'));
+    historyModal.show();
+    loadHistory(); // Ваша существующая функция загрузки истории
+  });
+
+// Обработчик успешного входа
+function handleSuccessfulLogin(userData) {
+    // Закрываем модальное окно
+    const modal = bootstrap.Modal.getInstance(document.getElementById('authModal'));
+    modal.hide();
+    
+    // Обновляем интерфейс
+    updateAuthUI(userData.user);
+    
+    // Сохраняем данные
+    localStorage.setItem('currentUser', JSON.stringify(userData.user));
+    
+    
+    // Дополнительные действия
+    console.log('Пользователь вошел:', userData.user);
+    updateDocumentHistoryBadge(); // Обновляем бейдж с количеством документов
+}
+
+// Функция для обновления бейджа истории
+function updateDocumentHistoryBadge() {
+    fetch(`${BASE_URL}/api/history/count`, {
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        const badge = document.createElement('span');
+        badge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger';
+        badge.textContent = data.count;
+        
+        const historyBtn = document.getElementById('historyBtn');
+        historyBtn.classList.add('position-relative');
+        historyBtn.appendChild(badge);
+    })
+    .catch(console.error);
+}
+  // Проверка при загрузке страницы
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      updateAuthUI(JSON.parse(savedUser));
+    }
+  });
+  
+  // Обработчик выхода
+  document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('currentUser');
+    updateAuthUI(null);
+    alert('Вы вышли из системы');
+  });
+  
+  // Модифицируем ваш обработчик входа:
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    try {
+      const form = e.target;
+      const username = form.querySelector('[name="username"]').value;
+      const password = form.querySelector('[name="password"]').value;
+  
+      const response = await fetch(`${BASE_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+        credentials: 'include'
+      });
+  
+      const data = await response.json();
+      
+      if (response.ok) {
+        handleSuccessfulLogin(data);
+      } else {
+        alert(data.error || 'Ошибка входа');
+      }
+    } catch (error) {
+      console.error('Ошибка:', error);
+      alert('Произошла ошибка: ' + error.message);
+    }
+  });
+
+// Обработчики форм
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    try {
+        const form = e.target;
+        
+        // Проверяем существование элементов
+        const usernameInput = form.querySelector('input[name="username"]');
+        const passwordInput = form.querySelector('input[name="password"]');
+        
+        if (!usernameInput || !passwordInput) {
+            console.error('Не найдены поля ввода!');
+            alert('Ошибка формы: отсутствуют необходимые поля');
+            return;
+        }
+        
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (!username || !password) {
+            alert('Заполните все поля');
+            return;
+        }
+
+        console.log('Отправка данных:', { username, password });
+        const response = await fetch(`${BASE_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Ошибка сервера');
+        }
+
+        const data = await response.json();
+        $('#authModal').modal('hide');
+        alert(`Добро пожаловать, ${data.user?.username || 'пользователь'}!`);
+        
+    } catch (error) {
+        console.error('Ошибка входа:', error);
+        alert(error.message || 'Произошла ошибка при входе');
+    }
+});
+
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = e.target.elements[0].value;
+    const email = e.target.elements[1].value;
+    const password = e.target.elements[2].value;
+    
+    if (await register(username, email, password)) {
+        alert('Регистрация успешна! Теперь войдите.');
+        $('#authTabs a[href="#login"]').tab('show');
+    } else {
+        alert('Ошибка регистрации');
+    }
+});
+
+
+// Загрузка истории
+// Функция загрузки истории документов
+async function loadHistory() {
+    try {
+        const response = await fetch(`${BASE_URL}/api/history`, {
+            credentials: 'include' // Важно для кук авторизации
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ошибка: ${response.status}`);
+        }
+
+        const history = await response.json();
+        
+        if (!Array.isArray(history)) {
+            throw new Error("Некорректный формат данных");
+        }
+
+        console.log("Получена история:", history); // Для отладки
+        
+        renderHistory(history);
+
+    } catch (error) {
+        console.error("Ошибка загрузки истории:", error);
+        alert("Не удалось загрузить историю. Проверьте консоль для деталей.");
+    }
+}
+
+
+function renderHistory(items) {
+    const tbody = document.getElementById('historyTableBody');
+    
+    if (!items || items.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="3" class="text-center py-4">Нет данных</td>
+        </tr>
+      `;
+      return;
+    }
+  
+    tbody.innerHTML = items.map(item => `
+      <tr>
+        <td>${item.document_name || item.template_name || 'Документ'}</td>
+        <td>${item.template_name || 'Без названия'}</td>
+        <td>${new Date(item.generated_at).toLocaleString()}</td>
+        <td>
+          <a href="${item.download_link}" class="btn btn-sm btn-primary" download>
+            Скачать
+          </a>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+// Функция удаления элемента истории
+async function deleteHistoryItem(id) {
+    try {
+        const response = await fetch(`${BASE_URL}/api/history/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        
+        if (!response.ok) throw new Error('Ошибка удаления');
+        
+        showToast('Документ удалён из истории');
+        await loadHistory(); // Перезагружаем историю
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showToast(error.message, 'error');
+    }
+}
+
+
+// Функция для показа уведомлений
+function showToast(message, type = 'success') {
+    // Реализация toast-уведомлений (можно использовать библиотеку или создать свои)
+    alert(message); // Временное решение - можно заменить на красивый toast
+}
+
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    // Проверяем авторизацию
+    fetch(`${BASE_URL}/api/check-auth`, {
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.authenticated) {
+            updateAuthUI(data.user);
+        }
+    })
+    .catch(console.error);
+    
+    // Обработчик выхода
+    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch(`${BASE_URL}/logout`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                updateAuthUI(null);
+            }
+        } catch (error) {
+            console.error('Ошибка выхода:', error);
+            showToast('Ошибка при выходе', 'error');
+        }
+    });
+});
+
+
+// Инициализация
+updateAuthUI();
