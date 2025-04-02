@@ -217,7 +217,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return jsonify({"message": "Logged out"}), 200
+    return jsonify({"message": "Logged out"})
 
 @app.route('/api/history', methods=['GET'])
 @login_required
