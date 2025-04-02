@@ -1289,8 +1289,6 @@ function handleSuccessfulLogin(userData) {
     // Сохраняем данные
     localStorage.setItem('currentUser', JSON.stringify(userData.user));
     
-    // Показываем уведомление
-    showToast(`Добро пожаловать, ${userData.user.username}!`);
     
     // Дополнительные действия
     console.log('Пользователь вошел:', userData.user);
@@ -1528,7 +1526,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (response.ok) {
                 updateAuthUI(null);
-                showToast('Вы успешно вышли из системы');
             }
         } catch (error) {
             console.error('Ошибка выхода:', error);
