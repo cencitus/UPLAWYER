@@ -1528,5 +1528,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+
+
 // Инициализация
 updateAuthUI();

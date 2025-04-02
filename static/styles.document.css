@@ -1,165 +1,137 @@
-body {
-    background-image: url('back.jpg');
+/* ======= Цветовая схема ======= */
+:root {
+    --white: #ffffff;
+    --black: #000000;
+    --blue: #4285F4;
+    --light-purple: #BB86FC;
+    --purple: #9C27B0;
+    --dark-purple: #7B1FA2;
+  }
+  
+  /* ======= Основные стили ======= */
+  body {
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
-}
-
-.top-header {
+    font-family: "Poppins", sans-serif;
+    color: var(--black);
+  }
+  
+  .top-header {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     height: 75px;
     padding-top: 0;
     padding-bottom: 0;
-}
-
-a {
+    background-color: var(--white);
+  }
+  
+  /* ======= Навигация и ссылки ======= */
+  a {
     font-family: "Poppins", sans-serif;
-    color: black; 
-    text-decoration: none; 
+    color: var(--black);
+    text-decoration: none;
     font-weight: 700;
     font-size: 14px;
     margin-right: 30px;
-}
-
-a:hover {
-    color: #e5322d; 
-    text-decoration: none; 
-}
-
-
-.logoHref {
+    transition: color 0.3s ease;
+  }
+  
+  a:hover {
+    color: var(--purple);
+    text-decoration: none;
+  }
+  
+  .logoHref {
     margin-right: 40px;
-}
-
-.logo-image {
+  }
+  
+  .logo-image {
     height: 64px;
     margin-top: 10px;
     margin-bottom: 10px;
-}
-
-.authorize {
-    margin-right: 10px; 
-}
-
-.container {
-    max-width: 1350px;
-}
-
-.create-text {
+    transition: transform 0.3s ease;
+  }
+  
+  .logo-image:hover {
+    transform: scale(1.05);
+  }
+  
+  /* ======= Кнопки ======= */
+  .btn {
+    background-color: transparent;
+    border: 1px solid var(--blue);
+    color: var(--blue);
+    transition: all 0.3s ease;
+    font-weight: 700;
+  }
+  
+  .btn:hover {
+    background-color: var(--blue);
+    color: var(--white);
+  }
+  
+  .fileButton {
+    border: 0px;
+    background-color: transparent;
+    margin: 15px 0 0 15px;
+    color: var(--black);
+  }
+  
+  .fileButton:hover {
+    color: var(--purple);
+    background-color: transparent;
+  }
+  
+  /* ======= Формы и элементы управления ======= */
+  .search-input {
+    border: none;
+    margin: 0.5rem 0;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 2px solid var(--light-purple);
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-bottom-color: var(--purple);
+  }
+  
+  .dropdown-menu {
+    background-color: var(--white);
+    border: 1px solid var(--light-purple);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dropdown-item {
+    color: var(--black);
+    transition: all 0.3s ease;
+  }
+  
+  .dropdown-item:hover {
+    background-color: var(--light-purple);
+    color: var(--white);
+  }
+  
+  .dropdown-item:active {
+    background-color: var(--purple);
+    color: var(--white);
+  }
+  
+  /* ======= Типографика ======= */
+  .create-text {
     font-size: 42px;
     font-weight: 600;
     font-family: "Poppins", sans-serif;
-}
-
-.choose-text {
+    color: var(--dark-purple);
+  }
+  
+  .choose-text {
     font-size: 18px;
     font-weight: 500;
     font-family: "Poppins", sans-serif;
-}
-
-.btn {
-    background-color: transparent;
-    border: 1px solid #63686d; 
-    color: #63686d; 
-    transition: all 0.3s ease; 
+    color: var(--black);
   }
-  
-.btn:hover {
-background-color: #63686d; 
-color: #ffffff; 
-}
-
-
-.dropdown-menu {
-    background-color: #ffffff; 
-    border: 1px solid #6c757d; 
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Тень как у выпадающего списка */
-}
-  
-.dropdown-item {
-    color: #6c757d;
-    transition: all 0.3s ease; 
-}
-  
-.dropdown-item:hover {
-    background-color: #6c757d;
-    color: #ffffff;
-}
-  
-.dropdown-item:active {
-    background-color: #5c636a;
-    color: #ffffff;
-}
-
-
-/* Убираем рамку у строки поиска */
-.search-input {
-    border: none; 
-    margin: 0.5rem 0; 
-    padding: 0.5rem 1rem; 
-    width: 100%;
-    box-sizing: border-box; 
-}
-.search-input:focus {
-    outline: none; /* Убираем стандартное выделение */
-  }
-
-#search-results {
-    max-height: 200px; /* Ограничение высоты */
-    overflow-y: auto; /* Прокрутка, если контент превышает высоту */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Тень как у выпадающего списка */
-  }
-
-#search-results .dropdown-item:focus {
-    outline: none; /* Убираем рамку */
-    box-shadow: none; /* Убираем эффект тени, если есть */
-}
-
-.form-control:focus {
-    box-shadow: none !important;
-    border-color: #ccc !important; /* Вернуть к обычной рамке */
-}
-
-.my-6 {
-    padding-bottom: 1px;
-    width: 60%;
-    margin-top: 15px;
-    margin-bottom: 15px;
-    padding: 17px;
-}
-.form-label {
-    margin: 1px;
-}
-.mb-4 {
-    margin-bottom: 5px !important;
-}
-
-.fileButton {
-    border: 0px;
-    background-color: transparent;
-    margin: 15px 0 0 15px;
-}
-.fileButton:hover {
-    border: 0px;
-    background-color: transparent;
-    margin: 15px 0 0 15px;
-    color: #e5322d; 
-}
-
-@media (max-width: 1000px) {
-    .my-6{
-        width: 80%;
-    }
-}
-
-@media (max-width: 750px) {
-    .my-6{
-        display: flex;
-        flex-direction: column;
-    }
-}
-
-
 /* Стили для иконки чата */
 .chat-icon {
     position: fixed;
@@ -167,7 +139,7 @@ color: #ffffff;
     right: 20px;
     width: 60px;
     height: 60px;
-    background-color: #000000;
+    background-color: #9C27B0; /* Фиолетовый вместо черного */
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -177,93 +149,120 @@ color: #ffffff;
     font-size: 30px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     z-index: 1000;
-  }
-  /* Стили для окна чата */
-  .chat-window {
+    transition: transform 0.2s;
+}
+
+.chat-icon:hover {
+    transform: scale(1.1);
+}
+
+.chat-window {
     position: fixed;
     bottom: 90px;
     right: 20px;
-    width: 400px;
-    max-height: 600px;
+    width: 400px; /* Ширина прежняя */
+    height: 500px; /* Увеличена высота (было max-height: 600px) */
     background-color: #fff;
-    border: 1px solid #ccc;
+    border: 1px solid #E1BEE7;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     overflow: hidden;
     z-index: 1000;
-  }
-  .chat-header {
-    background-color: #000000;
+}
+
+.chat-header {
+    background-color: #7B1FA2; /* Темно-фиолетовый */
     color: #fff;
     padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-  .chat-header button {
+}
+
+.chat-header button {
     background: none;
     border: none;
     color: #fff;
     font-size: 16px;
     cursor: pointer;
-  }
-  .chat-messages {
+}
+
+.chat-messages {
     flex: 1;
     padding: 10px;
     overflow-y: auto;
-  }
-  .chat-message {
+}
+
+.chat-message {
     margin-bottom: 10px;
     padding: 5px;
     border-radius: 5px;
     max-width: 80%;
-  }
-  .chat-message.user {
-    background-color: #d1e7dd;
+}
+
+.chat-message.user {
+    background-color: #E1BEE7; /* Светло-сиреневый */
     align-self: flex-end;
-  }
-  .chat-message.bot {
-    background-color: #f1f1f1;
+}
+
+.chat-message.bot {
+    background-color: #F3E5F5; /* Очень светлый сиреневый */
     align-self: flex-start;
-  }
-  .chat-input {
+}
+
+.chat-input {
     display: flex;
     padding: 10px;
-    border-top: 1px solid #ccc;
-  }
-  .chat-input input {
+    border-top: 1px solid #E1BEE7; /* Светло-сиреневый */
+}
+
+.chat-input input {
     flex: 1;
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid #E1BEE7; /* Светло-сиреневый */
     border-radius: 4px;
-  }
-  .chat-input button {
+}
+
+.chat-input button {
     margin-left: 5px;
     padding: 5px 10px;
     border: none;
-    background-color: #000000;
+    background-color: #9C27B0; /* Фиолетовый */
     color: #fff;
     border-radius: 4px;
     cursor: pointer;
+}
+
+.chat-input button:hover {
+    background-color: #7B1FA2; /* Темно-фиолетовый */
+}
+  
+  /* ======= Адаптив ======= */
+  @media (max-width: 1000px) {
+    .my-6 {
+      width: 80%;
+    }
   }
-
-
- 
-#historyBtn {
-    font-family: "Poppins", sans-serif;
-    color: black;
-    cursor: pointer;
-    padding: 0.5rem 0;
+  
+  @media (max-width: 750px) {
+    .my-6 {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+  
+  /* ======= Дополнительные элементы ======= */
+  #historyBtn {
+    color: var(--black);
   }
   
   #historyBtn:hover {
-    color: #e5322d;
+    color: var(--purple);
   }
   
   #usernameDisplay {
-    font-family: "Poppins", sans-serif;
-    font-size: 14px;
-    font-weight: 500;
+    color: var(--dark-purple);
+    font-weight: 600;
   }
