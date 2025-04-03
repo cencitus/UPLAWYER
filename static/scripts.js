@@ -1245,23 +1245,37 @@ async function handleLogout(e) {
 
 
 // В функции updateAuthUI (которую вызываем после входа/выхода)
+document.getElementById('loginBtn').addEventListener('click', () => {
+    localStorage.setItem('authReloaded', 'true'); // Устанавливаем флаг перед входом
+    authenticateUser().then(user => {
+        if (user) {
+            updateAuthUI(user);
+        }
+    });
+});
+
 function updateAuthUI(user) {
     const loginBtn = document.getElementById('loginBtn');
     const userBlock = document.getElementById('userBlock');
     const historyBtn = document.getElementById('historyBtn');
     const usernameDisplay = document.getElementById('usernameDisplay');
-  
+
     if (user) {
-      loginBtn.classList.add('d-none');
-      userBlock.classList.remove('d-none');
-      historyBtn.classList.remove('d-none');
-      usernameDisplay.textContent = user.username;
+        loginBtn.classList.add('d-none');
+        userBlock.classList.remove('d-none');
+        historyBtn.classList.remove('d-none');
+        usernameDisplay.textContent = user.username;
+
+        if (localStorage.getItem('authReloaded')) {
+            localStorage.removeItem('authReloaded'); // Удаляем флаг после обновления
+            location.reload();
+        }
     } else {
-      loginBtn.classList.remove('d-none');
-      userBlock.classList.add('d-none');
-      historyBtn.classList.add('d-none');
+        loginBtn.classList.remove('d-none');
+        userBlock.classList.add('d-none');
+        historyBtn.classList.add('d-none');
     }
-  }
+}
   
   // Обработчик кнопки "История"
   document.getElementById('historyBtn')?.addEventListener('click', () => {
@@ -1526,6 +1540,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+
 
 
 // Инициализация
