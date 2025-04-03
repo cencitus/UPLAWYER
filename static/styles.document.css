@@ -168,10 +168,31 @@ color: #ffffff;
 
 /* Стили для иконки чата */
 .chat-icon {
+  background-image: url(chat-picture.jpg);
+  background-size: cover;
+  background-position: center;
+
   position: fixed;
   bottom: 20px;
   right: 20px;
   width: 60px;
+  height: 60px;
+  background-color: #000000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  font-size: 30px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+.chat-picture {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 70px;
   height: 60px;
   background-color: #000000;
   border-radius: 50%;
