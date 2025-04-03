@@ -3,35 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Шапка сайта</title>
+  <link rel="icon" href="logo-transparent.png" type="image/png">
+  <title>UPLAWYER</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.document.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:wght@500&display=swap" rel="stylesheet">
-  
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+
   </head>
 <body>
     <!-- Шапка -->
     <div class="top-header bg-white">
-        <div class="container d-flex align-items-center">
-            <!-- Логотип -->
-            <a href="create_document.html" class="logoHref">
-                <img src="logo.png" class="logo-image" alt="Логотип">
-            </a>
-
-            <!-- Кнопка "Создать документ" -->
-            <a href="create_document.html">СОЗДАТЬ ДОКУМЕНТ</a>
-      
-            <!-- Кнопки справа -->
-            <div class="authorize ms-auto">
-                <a href="#" class="logoHref">
-                    <img src="authorize.png" class="logo-image" alt="Логотип">
-                </a>
+      <div class="container d-flex align-items-center">
+        <!-- Логотип -->
+        <a href="create_document.html" class="logoHref">
+          <img src="logo-transparent.png" class="logo-image" alt="Логотип">
+        </a>
+    
+        <!-- Основные ссылки -->
+        <a href="#" class="nav-link ms-4" id="createDocLink">СОЗДАТЬ ДОКУМЕНТ</a>
+        <button class="nav-link ms-4 border-0 bg-transparent d-none" id="historyBtn" style="font-weight: 700;">ИСТОРИЯ</button>
+        <!-- 
+        <button class="nav-link ms-3 border-0 bg-transparent d-none" id="historyBtn" style="font-weight: 700;">ИСТОРИЯ</button>
+        -->
+    
+        <!-- Блок авторизации -->
+        <div class="authorize ms-auto">
+          <div id="authBlock">
+            <!-- Гость -->
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#authModal" id="loginBtn">
+              Войти
+            </button>
+            
+            <!-- Авторизованный пользователь -->
+            <div class="d-none align-items-center" id="userBlock">
+              <span class="me-3" id="usernameDisplay"></span>
+              <button class="btn btn-outline-danger btn-sm" id="logoutBtn">Выйти</button>
             </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Добавить в body -->
+<div class="modal fade" id="authModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Вход / Регистрация</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs" id="authTabs">
+          <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#login">Вход</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#register">Регистрация</a>
+          </li>
+        </ul>
+        
+        <div class="tab-content mt-3">
+          <div id="login" class="tab-pane fade show active">
+            <form id="loginForm">
+              <div class="mb-3">
+                  <input type="text" 
+                         name="username" 
+                         class="form-control" 
+                         placeholder="Логин" 
+                         required>
+              </div>
+              <div class="mb-3">
+                  <input type="password" 
+                         name="password" 
+                         class="form-control" 
+                         placeholder="Пароль" 
+                         required>
+              </div>
+              <button type="submit" class="btn btn-primary">Войти</button>
+          </form>
+          </div>
+          
+          <div id="register" class="tab-pane fade">
+            <form id="registerForm">
+              <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Логин" required>
+              </div>
+              <div class="mb-3">
+                <input type="email" class="form-control" placeholder="Email" required>
+              </div>
+              <div class="mb-3">
+                <input type="password" class="form-control" placeholder="Пароль" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="modal fade" id="historyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">История документов</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Имя</th>
+                                <th>Тип</th>
+                                <th>Дата создания</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- История будет загружена здесь -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
     <div id="qwerty">
       <div class="container my-5 text-center">
@@ -137,101 +243,108 @@
       
     </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src ="scripts.js" defer></script>
-  <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
 
-  <div class="chat-icon" id="chatIcon">💬</div>
-
-  <!-- Окно чата (по умолчанию скрыто) -->
-  <div class="chat-window" id="chatWindow" style="display: none;">
-    <div class="chat-header">
-      <span>Чат поддержки</span>
-      <button id="closeChat">X</button>
+    <div class="chat-icon" id="chatIcon">💬</div>
+ 
+    <!-- Окно чата (по умолчанию скрыто) -->
+    <div class="chat-window" id="chatWindow" style="display: none;">
+      <div class="chat-header">
+        <span>Чат поддержки</span>
+        <button id="closeChat">X</button>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-message bot">Привет! Чем могу помочь?</div>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Напишите сообщение..." />
+        <button id="sendChat">Отправить</button>
+      </div>
     </div>
-    <div class="chat-messages" id="chatMessages">
-      <div class="chat-message bot">Привет! Чем могу помочь?</div>
-    </div>
-    <div class="chat-input">
-      <input type="text" id="chatInput" placeholder="Напишите сообщение..." />
-      <button id="sendChat">Отправить</button>
-    </div>
-  </div>
-
-  <script>
-    const chatIcon = document.getElementById("chatIcon");
-    const chatWindow = document.getElementById("chatWindow");
-    const closeChat = document.getElementById("closeChat");
-    const chatMessages = document.getElementById("chatMessages");
-    const chatInput = document.getElementById("chatInput");
-    const sendChat = document.getElementById("sendChat");
-
-    chatIcon.addEventListener("click", () => {
-      chatWindow.style.display = "flex";
-    });
-    closeChat.addEventListener("click", () => {
-      chatWindow.style.display = "none";
-    });
-
-    // Функция для добавления сообщения в чат
-    function addMessage(sender, text) {
-      const messageDiv = document.createElement("div");
-      messageDiv.classList.add("chat-message", sender);
-      messageDiv.textContent = text;
-      chatMessages.appendChild(messageDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    async function sendMessage(message) {
-      addMessage("user", message);
-
-      try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer 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",
-            "HTTP-Referer": "http://127.0.0.1:5500",
-            "X-Title": "DocumentGenerator"
-          },
-          body: JSON.stringify({
-            model: "deepseek/deepseek-chat-v3-0324:free",
-            messages: [{ role: "user", content: message }]
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error("Ошибка API");
+  
+    <script>
+      // Получаем элементы
+      const chatIcon = document.getElementById("chatIcon");
+      const chatWindow = document.getElementById("chatWindow");
+      const closeChat = document.getElementById("closeChat");
+      const chatMessages = document.getElementById("chatMessages");
+      const chatInput = document.getElementById("chatInput");
+      const sendChat = document.getElementById("sendChat");
+  
+      // Открытие и закрытие окна чата
+      chatIcon.addEventListener("click", () => {
+        chatWindow.style.display = "flex";
+      });
+      closeChat.addEventListener("click", () => {
+        chatWindow.style.display = "none";
+      });
+  
+      // Функция для добавления сообщения в чат
+      function addMessage(sender, text) {
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("chat-message", sender);
+        messageDiv.textContent = text;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+  
+      // Функция для отправки сообщения на API OpenRouter
+      async function sendMessage(message) {
+        // Добавляем сообщение пользователя
+        addMessage("user", message);
+  
+        // Замените YOUR_API_KEY, YOUR_SITE_URL, YOUR_SITE_NAME ниже на свои данные
+        try {
+          const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "",
+              "HTTP-Referer": "http://127.0.0.1:5500",
+              "X-Title": "DocumentGenerator"
+            },
+            body: JSON.stringify({
+              model: "deepseek/deepseek-chat-v3-0324:free",
+              messages: [{ role: "user", content: message }]
+            })
+          });
+  
+          if (!response.ok) {
+            throw new Error("Ошибка API");
+          }
+  
+          const data = await response.json();
+          const botReply = data.choices[0].message.content;
+          addMessage("bot", botReply);
+        } catch (error) {
+          console.error("Ошибка отправки сообщения:", error);
+          addMessage("bot", "Ошибка: не удалось получить ответ от сервера.");
         }
-
-        const data = await response.json();
-        const botReply = data.choices[0].message.content;
-        addMessage("bot", botReply);
-      } catch (error) {
-        console.error("Ошибка отправки сообщения:", error);
-        addMessage("bot", "Ошибка: не удалось получить ответ от сервера.");
       }
-    }
-
-    // Обработчик кнопки "Отправить"
-    sendChat.addEventListener("click", () => {
-      const message = chatInput.value.trim();
-      if (message !== "") {
-        sendMessage(message);
-        chatInput.value = "";
-      }
-    });
-
-    // Отправка сообщения по нажатию Enter
-    chatInput.addEventListener("keyup", (e) => {
-      if (e.key === "Enter") {
+  
+      // Обработчик кнопки "Отправить"
+      sendChat.addEventListener("click", () => {
         const message = chatInput.value.trim();
         if (message !== "") {
           sendMessage(message);
           chatInput.value = "";
         }
-      }
-    });
-  </script>
+      });
+  
+      // Отправка сообщения по нажатию Enter
+      chatInput.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+          const message = chatInput.value.trim();
+          if (message !== "") {
+            sendMessage(message);
+            chatInput.value = "";
+          }
+        }
+      });
+    </script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src ="scripts.js" defer></script>
+  <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
 </body>
 </html>
