@@ -128,7 +128,6 @@ def generate_docx_document_with_path(name_of_doc):
                     apply_styles_to_paragraph(paragraph)
 
         # Сохраняем документ в буфер памяти
-        from io import BytesIO
         buffer = BytesIO()
         doc.save(buffer)
         buffer.seek(0)
@@ -138,29 +137,30 @@ def generate_docx_document_with_path(name_of_doc):
             user_id=current_user.id,
             document_name=generate_document_name(name_of_doc, data),
             template_name=name_of_doc,
-            download_link=f"/download_doc/{name_of_doc}",  # Новый эндпоинт для скачивания
+            download_link=f"/download_doc/{name_of_doc}",
             file_data=file_data,
             file_type='docx'
         )
         db.session.add(doc_history)
         db.session.commit()
 
-        
+        # Возвращаем файл для скачивания
+        buffer.seek(0)  # Сбрасываем позицию буфера
+        return send_file(
+            buffer,
+            as_attachment=True,
+            download_name=f"{doc_history.document_name}.docx",
+            mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        )
 
     except Exception as e:
         app.logger.error(f"Ошибка: {e}")
         app.logger.error(traceback.format_exc())
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
     
-from io import BytesIO
-import tempfile
-import os
-from flask import send_file
-
 @app.route('/generate_p/<name_of_doc>', methods=['POST'])
 def generate_pdf_document(name_of_doc):
     try:
-        # Проверка входных данных
         data = request.json
         if not data:
             return jsonify({"error": "No data provided"}), 400
@@ -179,49 +179,39 @@ def generate_pdf_document(name_of_doc):
                     apply_styles_to_paragraph(paragraph)
 
         # Создаем временную директорию
-        temp_dir = tempfile.mkdtemp()
-        temp_docx_path = os.path.join(temp_dir, 'temp.docx')
-        output_pdf_path = os.path.join(temp_dir, 'output.pdf')
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_docx_path = os.path.join(temp_dir, 'temp.docx')
+            output_pdf_path = os.path.join(temp_dir, 'output.pdf')
 
-        # Сохраняем DOCX во временный файл
-        doc.save(temp_docx_path)
+            # Сохраняем DOCX во временный файл
+            doc.save(temp_docx_path)
 
-        # Конвертируем в PDF
-        convert(temp_docx_path, output_pdf_path)
+            # Конвертируем в PDF
+            convert(temp_docx_path, output_pdf_path)
 
-        # Читаем PDF в память
-        with open(output_pdf_path, 'rb') as f:
-            pdf_data = f.read()
+            # Читаем PDF в память
+            with open(output_pdf_path, 'rb') as f:
+                pdf_data = f.read()
 
-        # Сохраняем в базу данных
-        doc_history = DocumentHistory(
-            user_id=current_user.id,
-            document_name=generate_document_name(name_of_doc, data),
-            template_name=name_of_doc,
-            download_link=f"/download_doc/{name_of_doc}",
-            file_data=pdf_data,
-            file_type='pdf'
-        )
-        db.session.add(doc_history)
-        db.session.commit()
+            # Сохраняем в базу данных
+            doc_history = DocumentHistory(
+                user_id=current_user.id,
+                document_name=generate_document_name(name_of_doc, data),
+                template_name=name_of_doc,
+                download_link=f"/download_doc/{name_of_doc}",
+                file_data=pdf_data,
+                file_type='pdf'
+            )
+            db.session.add(doc_history)
+            db.session.commit()
 
-        # Отправляем файл для предпросмотра
-        response = send_file(
-            BytesIO(pdf_data),
-            mimetype='application/pdf',
-            as_attachment=False,
-            download_name=f"{doc_history.document_name}.pdf"
-        )
-
-        # Очистка временных файлов
-        try:
-            os.remove(temp_docx_path)
-            os.remove(output_pdf_path)
-            os.rmdir(temp_dir)
-        except Exception as cleanup_error:
-            app.logger.warning(f"Ошибка очистки временных файлов: {cleanup_error}")
-
-        return response
+            # Возвращаем файл для предпросмотра
+            return send_file(
+                BytesIO(pdf_data),
+                mimetype='application/pdf',
+                as_attachment=False,
+                download_name=f"{doc_history.document_name}.pdf"
+            )
 
     except Exception as e:
         app.logger.error(f"Ошибка: {e}")
