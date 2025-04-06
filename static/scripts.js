@@ -1446,30 +1446,46 @@ function renderHistory(items) {
     const tbody = document.getElementById('historyTableBody');
     
     if (!items || items.length === 0) {
-      tbody.innerHTML = `
+        tbody.innerHTML = `
         <tr>
-          <td colspan="3" class="text-center py-4">Нет данных</td>
+            <td colspan="4" class="text-center py-4">Нет данных</td>
         </tr>
-      `;
-      return;
+        `;
+        return;
     }
-  
+    
     tbody.innerHTML = items.map(item => `
-      <tr>
-        <td>${item.document_name || item.template_name || 'Документ'}</td>
-        <td>${item.template_name || 'Без названия'}</td>
-        <td>${new Date(item.generated_at).toLocaleString()}</td>
-        <td>
-          <a href="${item.download_link}" class="btn btn-sm btn-primary" download>
-            Скачать
-          </a>
-        </td>
-      </tr>
+        <tr>
+            <td>${item.document_name || item.template_name || 'Документ'}</td>
+            <td>${item.template_name || 'Без названия'}</td>
+            <td>${new Date(item.generated_at).toLocaleString()}</td>
+            <td>
+                <div class="d-flex gap-2">
+                    <a href="${item.download_link}" class="btn btn-sm btn-primary" download>
+                        Скачать
+                    </a>
+                    <button class="btn btn-sm btn-danger delete-btn" data-id="${item.id}">
+                        Удалить
+                    </button>
+                </div>
+            </td>
+        </tr>
     `).join('');
-  }
+    
+    // Добавляем обработчики для кнопок удаления
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const docId = e.target.getAttribute('data-id');
+            deleteHistoryItem(docId);
+        });
+    });
+}
 
-// Функция удаления элемента истории
 async function deleteHistoryItem(id) {
+    if (!confirm('Вы уверены, что хотите удалить этот документ?')) {
+        return;
+    }
+    
     try {
         const response = await fetch(`${BASE_URL}/api/history/${id}`, {
             method: 'DELETE',
@@ -1478,11 +1494,12 @@ async function deleteHistoryItem(id) {
         
         if (!response.ok) throw new Error('Ошибка удаления');
         
-        showToast('Документ удалён из истории');
-        await loadHistory(); // Перезагружаем историю
+        // Обновляем список после удаления
+        await loadHistory();
+        showToast('Документ успешно удалён');
     } catch (error) {
         console.error('Ошибка:', error);
-        showToast(error.message, 'error');
+        showToast('Не удалось удалить документ', 'error');
     }
 }
 
