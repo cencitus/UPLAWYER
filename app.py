@@ -4,6 +4,10 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from flask import Flask, request, send_file, jsonify, send_from_directory
 from flask_cors import CORS
 from docx import Document
+from io import BytesIO
+from pathlib import Path
+import tempfile
+from flask import make_response
 from docx.shared import Pt, RGBColor
 import traceback
 import os
@@ -40,8 +44,10 @@ class DocumentHistory(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     template_name = db.Column(db.String(100))
     generated_at = db.Column(db.DateTime, default=datetime.utcnow)
-    download_link = db.Column(db.String(255))
-    document_name = db.Column(db.String(100))  # Новое поле для уникального имени
+    download_link = db.Column(db.String(255))  # Можно оставить для обратной совместимости
+    document_name = db.Column(db.String(100))
+    file_data = db.Column(db.LargeBinary)  # Бинарные данные файла
+    file_type = db.Column(db.String(50))   # Тип файла: 'docx' или 'pdf'
 
 def apply_styles_to_paragraph(paragraph):
     for run in paragraph.runs:
@@ -121,24 +127,37 @@ def generate_docx_document_with_path(name_of_doc):
                     paragraph.text = paragraph.text.replace(placeholder, value)
                     apply_styles_to_paragraph(paragraph)
 
-        output_path = 'generated_document.docx'
-        doc.save(output_path)
+        # Сохраняем документ в буфер памяти
+        buffer = BytesIO()
+        doc.save(buffer)
+        buffer.seek(0)
+        file_data = buffer.read()
+
         doc_history = DocumentHistory(
             user_id=current_user.id,
-            document_name = generate_document_name(name_of_doc, data),
+            document_name=generate_document_name(name_of_doc, data),
             template_name=name_of_doc,
-            download_link=f"/downloads/{output_path}"  # или полный URL
+            download_link=f"/download_doc/{name_of_doc}",
+            file_data=file_data,
+            file_type='docx'
         )
         db.session.add(doc_history)
         db.session.commit()
 
-        return send_file(output_path, as_attachment=True, download_name='generated_document.docx')
+        # Возвращаем файл для скачивания
+        buffer.seek(0)  # Сбрасываем позицию буфера
+        return send_file(
+            buffer,
+            as_attachment=True,
+            download_name=f"{doc_history.document_name}.docx",
+            mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        )
 
     except Exception as e:
         app.logger.error(f"Ошибка: {e}")
         app.logger.error(traceback.format_exc())
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
-
+    
 @app.route('/generate_p/<name_of_doc>', methods=['POST'])
 def generate_pdf_document(name_of_doc):
     try:
@@ -150,8 +169,8 @@ def generate_pdf_document(name_of_doc):
         if not os.path.exists(template_path):
             return jsonify({"error": f"Template file not found: {template_path}"}), 404
 
+        # Обработка DOCX шаблона
         doc = Document(template_path)
-
         for paragraph in doc.paragraphs:
             for key, value in data.items():
                 placeholder = f'{{{{ {key} }}}}'
@@ -159,29 +178,77 @@ def generate_pdf_document(name_of_doc):
                     paragraph.text = paragraph.text.replace(placeholder, value)
                     apply_styles_to_paragraph(paragraph)
 
-        temp_docx_path = 'temp_document.docx'
-        doc.save(temp_docx_path)
+        # Создаем временную директорию
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_docx_path = os.path.join(temp_dir, 'temp.docx')
+            output_pdf_path = os.path.join(temp_dir, 'output.pdf')
 
-        output_pdf_path = 'generated_document.pdf'
-        convert("temp_document.docx", "generated_document.pdf")
+            # Сохраняем DOCX во временный файл
+            doc.save(temp_docx_path)
 
-        doc_history = DocumentHistory(
-            user_id=current_user.id,
-            document_name = generate_document_name(name_of_doc, data),
-            template_name=name_of_doc,
-            download_link=f"/downloads/{output_pdf_path}"  # или полный URL
-        )
-        db.session.add(doc_history)
-        db.session.commit()
+            # Конвертируем в PDF
+            convert(temp_docx_path, output_pdf_path)
 
+            # Читаем PDF в память
+            with open(output_pdf_path, 'rb') as f:
+                pdf_data = f.read()
 
-        return send_file(output_pdf_path, as_attachment=True, download_name='generated_document.pdf')
-    
-        
+            # Сохраняем в базу данных
+            doc_history = DocumentHistory(
+                user_id=current_user.id,
+                document_name=generate_document_name(name_of_doc, data),
+                template_name=name_of_doc,
+                download_link=f"/download_doc/{name_of_doc}",
+                file_data=pdf_data,
+                file_type='pdf'
+            )
+            db.session.add(doc_history)
+            db.session.commit()
+
+            # Возвращаем файл для предпросмотра
+            return send_file(
+                BytesIO(pdf_data),
+                mimetype='application/pdf',
+                as_attachment=False,
+                download_name=f"{doc_history.document_name}.pdf"
+            )
+
     except Exception as e:
         app.logger.error(f"Ошибка: {e}")
         app.logger.error(traceback.format_exc())
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
+    
+
+@app.route('/download_doc/<int:doc_id>')
+@login_required
+def download_document(doc_id):
+    doc = DocumentHistory.query.filter_by(
+        id=doc_id,
+        user_id=current_user.id
+    ).first()
+
+    if not doc:
+        return jsonify({"error": "Document not found"}), 404
+
+    # Определяем MIME-тип и расширение файла
+    if doc.file_type == 'pdf':
+        mimetype = 'application/pdf'
+        extension = 'pdf'
+    else:
+        mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        extension = 'docx'
+
+    # Создаем временный файл в памяти
+    from io import BytesIO
+    buffer = BytesIO(doc.file_data)
+    
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"{doc.document_name}.{extension}",
+        mimetype=mimetype
+    )
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -233,14 +300,16 @@ def get_history():
             'id': item.id,
             'template_name': item.template_name,
             'generated_at': item.generated_at.replace(tzinfo=timezone.utc)
-                             .astimezone(tz=None)  # Конвертирует в локальный пояс
+                             .astimezone(tz=None)
                              .strftime('%d.%m.%Y %H:%M'),
-            'download_link': item.download_link,
-            'document_name': item.document_name
+            'download_link': f"/download_doc/{item.id}",  # Используем новый эндпоинт
+            'document_name': item.document_name,
+            'file_type': item.file_type
         } for item in history])
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
 
 @app.route('/api/history/<int:doc_id>', methods=['DELETE'])
 @login_required

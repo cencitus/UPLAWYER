@@ -292,13 +292,12 @@
         // Добавляем сообщение пользователя
         addMessage("user", message);
     
-        // Замените YOUR_API_KEY, YOUR_SITE_URL, YOUR_SITE_NAME ниже на свои данные
         try {
           const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": "Bearer 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",
+              "Authorization": "Bearer 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",
               "HTTP-Referer": "http://127.0.0.1:5500",
               "X-Title": "DocumentGenerator"
             },
