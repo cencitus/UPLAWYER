@@ -18,7 +18,10 @@ closeChat.addEventListener("click", () => {
 function addMessage(sender, text) {
     const messageDiv = document.createElement("div");
     messageDiv.classList.add("chat-message", sender);
-    messageDiv.textContent = text;
+    
+    // Рендерим Markdown -> HTML
+    messageDiv.innerHTML = marked.parse(text);
+    
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }

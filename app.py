@@ -349,6 +349,20 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 def chat():
     user_message = request.json.get("message")
 
+    # Инструкции для Markdown
+    system_prompt = """
+    Ты - профессиональный юридический ассистент с 10-летним опытом. Давай четкие, уверенные ответы без оговорок. 
+
+    Правила общения:
+    1. Отвечай как эксперт: кратко, по делу, со ссылками на законы (статьи УК РФ, ГК РФ и др.)
+    2. Не используй фразы: "лучше обратиться к юристу", "если вам нужна точная информация" 
+    3. Если вопрос выходит за твою экспертизу, говори: "Этот вопрос требует дополнительного анализа. Рекомендую изучить [конкретный закон/практику]"
+    4. Отвечай строго в формате Markdown без изображений и без эмодзи. Отвечай как высококфалифицированный и профессиональный юрист. Используй:
+    - **Жирный текст** для ключевых терминов.
+    - Заголовки `##`, списки `-` или `1.`.
+    - Разделяй абзацы пустыми строками.
+    """
+
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
@@ -357,9 +371,14 @@ def chat():
     }
 
     payload = {
-        "model": "deepseek/deepseek-chat-v3-0324:free",
-        "messages": [{"role": "user", "content": user_message}]
-    }
+    "model": "deepseek/deepseek-chat-v3-0324:free",
+    "messages": [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_message}
+    ],
+    "temperature": 0.3, 
+    "max_tokens": 1000
+}
 
     try:
         response = requests.post("https://openrouter.ai/api/v1/chat/completions",
