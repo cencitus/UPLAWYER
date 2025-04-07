@@ -21,14 +21,24 @@ load_dotenv()  # загружает .env
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://gen_user:12345678i@109.73.193.193:5432/default_db'
-app.config['SECRET_KEY'] = 'your-secret-key-here'
-db = SQLAlchemy(app)
-login_manager = LoginManager(app)
-CORS(app, 
-    resources={r"/*": {"origins": "http://127.0.0.1:5500"}},
-    supports_credentials=True  # Разрешаем передачу кук
+
+# Конфигурация БД
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}"
+    f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
 )
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
+# Инициализация БД
+db = SQLAlchemy(app)
+
+CORS(app, 
+    resources={r"/*": {
+        "origins": "http://127.0.0.1:5500",  # Фиксированный origin
+        "supports_credentials": True
+    }}
+)
+login_manager = LoginManager(app)
 
 DEFAULT_FONT_NAME = "Times New Roman"
 DEFAULT_FONT_SIZE = 12
