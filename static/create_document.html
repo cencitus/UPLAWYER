@@ -261,90 +261,14 @@
       </div>
     </div>
   
-    <script>
-      // Получаем элементы
-      const chatIcon = document.getElementById("chatIcon");
-      const chatWindow = document.getElementById("chatWindow");
-      const closeChat = document.getElementById("closeChat");
-      const chatMessages = document.getElementById("chatMessages");
-      const chatInput = document.getElementById("chatInput");
-      const sendChat = document.getElementById("sendChat");
-    
-      // Открытие и закрытие окна чата
-      chatIcon.addEventListener("click", () => {
-        chatWindow.style.display = "flex";
-      });
-      closeChat.addEventListener("click", () => {
-        chatWindow.style.display = "none";
-      });
-    
-      // Функция для добавления сообщения в чат
-      function addMessage(sender, text) {
-        const messageDiv = document.createElement("div");
-        messageDiv.classList.add("chat-message", sender);
-        messageDiv.textContent = text;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-    
-      // Функция для отправки сообщения на API OpenRouter
-      async function sendMessage(message) {
-        // Добавляем сообщение пользователя
-        addMessage("user", message);
-    
-        try {
-          const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer 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",
-              "HTTP-Referer": "http://127.0.0.1:5500",
-              "X-Title": "DocumentGenerator"
-            },
-            body: JSON.stringify({
-              model: "deepseek/deepseek-chat-v3-0324:free",
-              messages: [{ role: "user", content: message }]
-            })
-          });
-    
-          if (!response.ok) {
-            throw new Error("Ошибка API");
-          }
-    
-          const data = await response.json();
-          const botReply = data.choices[0].message.content;
-          addMessage("bot", botReply);
-        } catch (error) {
-          console.error("Ошибка отправки сообщения:", error);
-          addMessage("bot", "Ошибка: не удалось получить ответ от сервера.");
-        }
-      }
-    
-      // Обработчик кнопки "Отправить"
-      sendChat.addEventListener("click", () => {
-        const message = chatInput.value.trim();
-        if (message !== "") {
-          sendMessage(message);
-          chatInput.value = "";
-        }
-      });
-    
-      // Отправка сообщения по нажатию Enter
-      chatInput.addEventListener("keyup", (e) => {
-        if (e.key === "Enter") {
-          const message = chatInput.value.trim();
-          if (message !== "") {
-            sendMessage(message);
-            chatInput.value = "";
-          }
-        }
-      });
-    </script>
 
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module" src ="scripts.js" defer></script>
   <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+  <script src="/static/templates/chat.js"></script>
+
+
 </body>
 </html>

@@ -1,4 +1,6 @@
+from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
+import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask import Flask, request, send_file, jsonify, send_from_directory
@@ -13,6 +15,9 @@ import traceback
 import os
 from datetime import datetime, timezone
 from docx2pdf import convert
+
+
+load_dotenv()  # загружает .env
 
 
 app = Flask(__name__)
@@ -336,6 +341,36 @@ def check_auth():
         })
     return jsonify({'authenticated': False})
 
+
+#чат
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+@app.route("/api/chat", methods=["POST"])
+def chat():
+    user_message = request.json.get("message")
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "HTTP-Referer": "http://127.0.0.1:5500", 
+        "X-Title": "DocumentGenerator"
+    }
+
+    payload = {
+        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "messages": [{"role": "user", "content": user_message}]
+    }
+
+    try:
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions",
+                                 headers=headers, json=payload)
+        response.raise_for_status()
+        data = response.json()
+        return jsonify({"reply": data["choices"][0]["message"]["content"]})
+
+    except Exception as e:
+        print("Ошибка:", e)
+        return jsonify({"reply": "Ошибка: не удалось получить ответ от сервера."}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5500, threaded=False)
