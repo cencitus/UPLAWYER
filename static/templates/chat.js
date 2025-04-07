@@ -6,13 +6,23 @@ const chatMessages = document.getElementById("chatMessages");
 const chatInput = document.getElementById("chatInput");
 const sendChat = document.getElementById("sendChat");
 
-// Открытие и закрытие окна чата
-chatIcon.addEventListener("click", () => {
-    chatWindow.style.display = "flex";
-});
+// Функция для переключения состояния чата (открыт/закрыт)
+function toggleChat() {
+    if (chatWindow.style.display === "flex") {
+        chatWindow.style.display = "none";
+    } else {
+        chatWindow.style.display = "flex";
+    }
+}
+
+// Открытие/закрытие по клику на иконку
+chatIcon.addEventListener("click", toggleChat);
+
+// Закрытие по клику на крестик
 closeChat.addEventListener("click", () => {
     chatWindow.style.display = "none";
 });
+
 
 // Функция для добавления сообщения в чат
 function addMessage(sender, text) {
