@@ -63,6 +63,7 @@ class DocumentHistory(db.Model):
     document_name = db.Column(db.String(100))
     file_data = db.Column(db.LargeBinary)  # Бинарные данные файла
     file_type = db.Column(db.String(50))   # Тип файла: 'docx' или 'pdf'
+    form_data = db.Column(db.JSON)  # Добавляем это поле для хранения данных формы
 
 def apply_styles_to_paragraph(paragraph):
     for run in paragraph.runs:
@@ -118,6 +119,8 @@ def generate_document_name(template_name, data):
     date_str = datetime.now().strftime("%d.%m.%Y")
     if template_name == "purchase&sale_agreement.docx":
         return f"ДКП {data.get('name_of_seller', '')} - {data.get('name_of_buyer', '')} {date_str}"
+    elif template_name == "rasporyajenie.docx":
+        return f"РОНЧ {data.get('name_of_organization', '')} {date_str}"
     else:
         return f"{template_name} {date_str}"
 
@@ -154,7 +157,8 @@ def generate_docx_document_with_path(name_of_doc):
             template_name=name_of_doc,
             download_link=f"/download_doc/{name_of_doc}",
             file_data=file_data,
-            file_type='docx'
+            file_type='docx',
+            form_data=data
         )
         db.session.add(doc_history)
         db.session.commit()
@@ -215,7 +219,8 @@ def generate_pdf_document(name_of_doc):
                 template_name=name_of_doc,
                 download_link=f"/download_doc/{name_of_doc}",
                 file_data=pdf_data,
-                file_type='pdf'
+                file_type='pdf',
+                form_data=data
             )
             db.session.add(doc_history)
             db.session.commit()
@@ -350,6 +355,27 @@ def check_auth():
             }
         })
     return jsonify({'authenticated': False})
+
+
+@app.route('/api/history/<int:doc_id>', methods=['GET'])
+@login_required
+def get_history_item(doc_id):
+    doc = DocumentHistory.query.filter_by(
+        id=doc_id,
+        user_id=current_user.id
+    ).first()
+
+    if not doc:
+        return jsonify({"error": "Document not found"}), 404
+
+    return jsonify({
+        'id': doc.id,
+        'template_name': doc.template_name,
+        'generated_at': doc.generated_at.isoformat(),
+        'document_name': doc.document_name,
+        'file_type': doc.file_type,
+        'form_data': doc.form_data if doc.form_data else {}  # Добавляем данные формы
+    })
 
 
 #чат

@@ -10,6 +10,13 @@ const searchInput = document.getElementById('general-search');
 const searchResults = document.getElementById('search-results');
 const allItems = document.querySelectorAll('.dropdown-item');
 
+const documentTypeNames = {
+    'purchase&sale_agreement.docx': 'Договор купли-продажи',
+    'order.docx': 'Приказ о начале разработки',
+    'rasporyajenie.docx': 'Распоряжение о начале разработки',
+    // Добавьте другие соответствия по мере необходимости
+};
+
 // Функция поиска
 searchInput.addEventListener('input', function () {
     const searchTerm = this.value.toLowerCase(); // Получаем текст из поля поиска
@@ -715,7 +722,7 @@ function renderHistory(items) {
     if (!items || items.length === 0) {
         tbody.innerHTML = `
         <tr>
-            <td colspan="4" class="text-center py-4">Нет данных</td>
+            <td colspan="5" class="text-center py-4">Нет данных</td>
         </tr>
         `;
         return;
@@ -724,13 +731,17 @@ function renderHistory(items) {
     tbody.innerHTML = items.map(item => `
         <tr>
             <td>${item.document_name || item.template_name || 'Документ'}</td>
-            <td>${item.template_name || 'Без названия'}</td>
+            <td>${documentTypeNames[item.template_name] || item.template_name}</td>
             <td>${new Date(item.generated_at).toLocaleString()}</td>
+            <td>${item.file_type || 'docx'}</td>
             <td>
                 <div class="d-flex gap-2">
                     <a href="${item.download_link}" class="btn btn-sm btn-primary" download>
                         Скачать
                     </a>
+                    <button class="btn btn-sm btn-warning edit-btn" data-id="${item.id}">
+                        Редактировать
+                    </button>
                     <button class="btn btn-sm btn-danger delete-btn" data-id="${item.id}">
                         Удалить
                     </button>
@@ -744,6 +755,14 @@ function renderHistory(items) {
         btn.addEventListener('click', (e) => {
             const docId = e.target.getAttribute('data-id');
             deleteHistoryItem(docId);
+        });
+    });
+    
+    // Добавляем обработчики для кнопок редактирования
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const docId = e.target.getAttribute('data-id');
+            restoreDocumentForm(docId);
         });
     });
 }
@@ -811,6 +830,118 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+
+async function restoreDocumentForm(docId) {
+    try {
+        // Получаем данные документа
+        const response = await fetch(`${BASE_URL}/api/history/${docId}`, {
+            credentials: 'include'
+        });
+        
+        if (!response.ok) throw new Error('Ошибка загрузки документа');
+        
+        const docData = await response.json();
+        
+        // Закрываем модальное окно истории
+        const historyModal = bootstrap.Modal.getInstance(document.getElementById('historyModal'));
+        if (historyModal) historyModal.hide();
+        
+        // Загружаем шаблон документа
+        const templateName = docData.template_name;
+        const templateConfig = Object.values(prepareFunctions).find(
+            config => config.endpoint === templateName
+        );
+        
+        if (!templateConfig) {
+            throw new Error('Шаблон не найден');
+        }
+        
+        // Ищем соответствующий тип документа в наших данных
+        const docType = Object.keys(prepareFunctions).find(
+            key => prepareFunctions[key].endpoint === templateName
+        );
+        
+        if (!docType) {
+            throw new Error('Тип документа не поддерживается');
+        }
+        
+        // Устанавливаем выбранный шаблон
+        selectedTemplate = docType;
+        
+        // Очищаем контейнер и создаем новую форму
+        const contentDiv = document.getElementById('qwerty');
+        contentDiv.innerHTML = '';
+        
+        // Создаем форму вручную (аналогично handleDocumentSelection)
+        if (documentFields[docType]) {
+            const fields = documentFields[docType];
+          
+            const form = document.createElement('form');
+            form.classList.add('container', 'my-6', 'bg-light', 'rounded', 'shadow-sm');
+          
+            fields.forEach(field => {
+              const formGroup = document.createElement('div');
+              formGroup.classList.add('mb-4');
+          
+              const label = document.createElement('label');
+              label.setAttribute('for', field.id);
+              label.textContent = field.label;
+              label.classList.add('form-label');
+          
+              const input = document.createElement('input');
+              input.setAttribute('type', field.type);
+              input.setAttribute('id', field.id);
+              input.classList.add('form-control');
+          
+              formGroup.appendChild(label);
+              formGroup.appendChild(input);
+              form.appendChild(formGroup);
+            });
+          
+            const submitButton = document.createElement('button');
+            submitButton.setAttribute('type', 'submit');
+            submitButton.classList.add('btn', 'save-button');
+            submitButton.textContent = 'Создать документ';
+
+            const docxButton = document.createElement('button');
+            docxButton.setAttribute('type', 'submit');
+            docxButton.classList.add('fileButton');
+            docxButton.textContent = 'Скачать документ .docx';
+
+            const PDFButton = document.createElement('button');
+            PDFButton.setAttribute('type', 'submit');
+            PDFButton.classList.add('fileButton');
+            PDFButton.textContent = 'Скачать документ .pdf';
+
+            const previewContainer = document.createElement('div');
+            previewContainer.setAttribute('id', 'preview-container');
+            previewContainer.classList.add('my-4');
+          
+            form.appendChild(submitButton); 
+            form.appendChild(PDFButton); 
+            form.appendChild(docxButton);
+            form.appendChild(previewContainer);
+          
+            contentDiv.appendChild(form);
+            
+            // Заполняем форму данными
+            if (docData.form_data) {
+                Object.entries(docData.form_data).forEach(([fieldId, value]) => {
+                    const input = form.querySelector(`#${fieldId}`);
+                    if (input) {
+                        input.value = value;
+                    }
+                });
+            }
+        } else {
+            contentDiv.innerHTML = `<p>Для выбранного типа документа нет данных для отображения.</p>`;
+        }
+        
+    } catch (error) {
+        console.error('Ошибка восстановления формы:', error);
+        alert('Не удалось восстановить форму: ' + error.message);
+    }
+}
 
 
 
