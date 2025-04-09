@@ -16,9 +16,7 @@ import os
 from datetime import datetime, timezone
 from docx2pdf import convert
 
-
 load_dotenv()  # загружает .env
-
 
 app = Flask(__name__)
 
