@@ -1,4 +1,6 @@
+from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
+import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask import Flask, request, send_file, jsonify, send_from_directory
@@ -15,15 +17,28 @@ from datetime import datetime, timezone
 from docx2pdf import convert
 
 
+load_dotenv()  # загружает .env
+
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sava2316@localhost/uplawyer_bd'
-app.config['SECRET_KEY'] = 'your-secret-key-here'
-db = SQLAlchemy(app)
-login_manager = LoginManager(app)
-CORS(app, 
-    resources={r"/*": {"origins": "http://127.0.0.1:5500"}},
-    supports_credentials=True  # Разрешаем передачу кук
+
+# Конфигурация БД
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}"
+    f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
 )
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
+# Инициализация БД
+db = SQLAlchemy(app)
+
+CORS(app, 
+    resources={r"/*": {
+        "origins": "http://127.0.0.1:5500",  # Фиксированный origin
+        "supports_credentials": True
+    }}
+)
+login_manager = LoginManager(app)
 
 DEFAULT_FONT_NAME = "Times New Roman"
 DEFAULT_FONT_SIZE = 12
@@ -336,6 +351,55 @@ def check_auth():
         })
     return jsonify({'authenticated': False})
 
+
+#чат
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+@app.route("/api/chat", methods=["POST"])
+def chat():
+    user_message = request.json.get("message")
+
+    # Инструкции для Markdown
+    system_prompt = """
+    Ты - профессиональный юридический ассистент с 35-летним опытом. Давай четкие, уверенные ответы без оговорок. 
+
+    Правила общения:
+    1. Отвечай как эксперт: кратко, по делу, со ссылками на законы (статьи УК РФ, ГК РФ и др.)
+    2. Не используй фразы: "лучше обратиться к юристу", "если вам нужна точная информация" 
+    3. Если вопрос выходит за твою экспертизу, говори: "Этот вопрос требует дополнительного анализа. Рекомендую изучить [конкретный закон/практику]"
+    4. Отвечай строго в формате Markdown без изображений и без эмодзи. Отвечай как высококфалифицированный и профессиональный юрист. Используй:
+    - **Жирный текст** для ключевых терминов.
+    - Заголовки `##`, списки `-` или `1.`.
+    - Разделяй абзацы пустыми строками.
+    """
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "HTTP-Referer": "http://127.0.0.1:5500", 
+        "X-Title": "DocumentGenerator"
+    }
+
+    payload = {
+    "model": "deepseek/deepseek-chat-v3-0324:free",
+    "messages": [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_message}
+    ],
+    "temperature": 0.3, 
+    "max_tokens": 1000
+}
+
+    try:
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions",
+                                 headers=headers, json=payload)
+        response.raise_for_status()
+        data = response.json()
+        return jsonify({"reply": data["choices"][0]["message"]["content"]})
+
+    except Exception as e:
+        print("Ошибка:", e)
+        return jsonify({"reply": "Ошибка: не удалось получить ответ от сервера."}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5500, threaded=False)

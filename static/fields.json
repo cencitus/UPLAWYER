@@ -1,0 +1,60 @@
+{
+    "Трудовой договор": [
+      { "label": "Дата заявления", "type": "date", "id": "date-statement" },
+      { "label": "ФИО заявителя", "type": "text", "id": "applicant-name" },
+      { "label": "Наименование организации", "type": "text", "id": "organization-name" },
+      { "label": "Город", "type": "text", "id": "city" }
+    ],
+    "Приказ о приеме на работу": [
+      { "label": "Дата заключения", "type": "date", "id": "date-contract" },
+      { "label": "ФИО арендодателя", "type": "text", "id": "landlord-name" },
+      { "label": "ФИО арендатора", "type": "text", "id": "tenant-name" },
+      { "label": "Адрес недвижимости", "type": "text", "id": "property-address" }
+    ],
+    "Договор купли-продажи": [
+      { "label": "Дата заявления", "type": "date", "id": "date" },
+      { "label": "Город", "type": "text", "id": "city" },
+      { "label": "ФИО продавца", "type": "text", "id": "name_of_seller" },
+      { "label": "ФИО покупателя", "type": "text", "id": "name_of_buyer" },
+      { "label": "Название вещи", "type": "text", "id": "name_of_things" },
+      { "label": "Стоимость вещи", "type": "text", "id": "cost" },
+      { "label": "Количество дней для передачи товара", "type": "text", "id": "count_day" }
+    ],
+    "Приказ о начале разработки": [
+      { "label": "Номер приказа", "type": "text", "id": "number_of_order" },
+      { "label": "Название организации", "type": "text", "id": "name_of_organization" },
+      { "label": "ОГРН", "type": "text", "id": "OGRN" },
+      { "label": "ИНН", "type": "text", "id": "INN" },
+      { "label": "Адрес", "type": "text", "id": "address" },
+      { "label": "Город", "type": "text", "id": "city" },
+      { "label": "Дата приказа", "type": "date", "id": "date" },
+      { "label": "Раздел трудового договора", "type": "text", "id": "chapter" },
+      { "label": "Номер трудового договора", "type": "text", "id": "number_of_TD" },
+      { "label": "Дата трудового договора", "type": "date", "id": "date_of_TD" },
+      { "label": "Предмет разработки", "type": "text", "id": "subject_of_dev" },
+      { "label": "Срок исполнения", "type": "date", "id": "term_date" },
+      { "label": "Должность исполнителя", "type": "text", "id": "post" },
+      { "label": "ФИО исполнителя", "type": "text", "id": "FIO" },
+      { "label": "Количество дней на выплату вознаграждения", "type": "text", "id": "count_of_day" },
+      { "label": "Должность руководителя разработки", "type": "text", "id": "post_dir" },
+      { "label": "ФИО руководителя разработки", "type": "text", "id": "FIO_dir" },
+      { "label": "Дата служебного задания", "type": "date", "id": "date_task" },
+      { "label": "Требования к ПО", "type": "text", "id": "requirements" },
+      { "label": "Номер служебного задания", "type": "text", "id": "num_of_task" },
+      { "label": "Должность руководителя организации", "type": "text", "id": "post_boss" },
+      { "label": "ФИО руководителя организации", "type": "text", "id": "FIO_boss" },
+      { "label": "Документ, на основании которого действует руководитель", "type": "text", "id": "document" }
+    ],
+    "Распоряжение": [
+      { "label": "Название организации", "type": "text", "id": "name_of_organization" },
+      { "label": "Номер распоряжения", "type": "text", "id": "number_of_order" },
+      { "label": "Номер рекламной стратегии", "type": "text", "id": "num_of_task" },
+      { "label": "Дата рекламной стратегии", "type": "date", "id": "date_start" },
+      { "label": "Дата распоряжения", "type": "date", "id": "date" },
+      { "label": "Город", "type": "text", "id": "city" },
+      { "label": "ФИО маркетолога", "type": "text", "id": "FIO" },
+      { "label": "Дата завершения", "type": "date", "id": "date_task" },
+      { "label": "Должность отдавшего распоряжение", "type": "text", "id": "post_boss" },
+      { "label": "ФИО отдавшего распоряжение", "type": "text", "id": "FIO_boss" }
+    ]
+  }

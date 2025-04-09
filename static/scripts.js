@@ -174,67 +174,17 @@ searchInput.addEventListener('input', function () {
     }
 });
 
+// Импорт шаблонов из json
+let documentFields = {}
 
-const documentFields = {
-    'Трудовой договор': [
-        { label: 'Дата заявления', type: 'date', id: 'date-statement' },
-        { label: 'ФИО заявителя', type: 'text', id: 'applicant-name' },
-        { label: 'Наименование организации', type: 'text', id: 'organization-name' },
-        { label: 'Город', type: 'text', id: 'city' },
-    ],
-    'Приказ о приеме на работу': [
-        { label: 'Дата заключения', type: 'date', id: 'date-contract' },
-        { label: 'ФИО арендодателя', type: 'text', id: 'landlord-name' },
-        { label: 'ФИО арендатора', type: 'text', id: 'tenant-name' },
-        { label: 'Адрес недвижимости', type: 'text', id: 'property-address' },
-    ],
-    'Договор купли-продажи': [
-        { label: 'Дата заявления', type: 'date', id: 'date' },
-        { label: 'Город', type: 'text', id: 'city' },
-        { label: 'ФИО продавца', type: 'text', id: 'name_of_seller' },
-        { label: 'ФИО покупателя', type: 'text', id: 'name_of_buyer' },
-        { label: 'Название вещи', type: 'text', id: 'name_of_things' },
-        { label: 'Стоимость вещи', type: 'text', id: 'cost' },
-        { label: 'Количество дней для передачи товара', type: 'text', id: 'count_day' },
-    ],
-    'Приказ о начале разработки' : [
-        {label: 'Номер приказа', type: 'text', id: 'number_of_order' },
-        {label: 'Название организации', type: 'text', id: 'name_of_organization' },
-        { label: 'ОГРН', type: 'text', id: 'OGRN' },
-        { label: 'ИНН', type: 'text', id: 'INN' },
-        { label: 'Адрес', type: 'text', id: 'address' },
-        { label: 'Город', type: 'text', id: 'city' },
-        { label: 'Дата приказа', type: 'date', id: 'date' },
-        { label: 'Раздел трудового договора', type: 'text', id: 'chapter' },
-        { label: 'Номер трудового договора', type: 'text', id: 'number_of_TD' },
-        { label: 'Дата трудового договора', type: 'date', id: 'date_of_TD' },
-        { label: 'Предмет разработки', type: 'text', id: 'subject_of_dev' },
-        { label: 'Срок исполнения', type: 'date', id: 'term_date' },
-        { label: 'Должность исполнителя', type: 'text', id: 'post' },
-        { label: 'ФИО исполнителя', type: 'text', id: 'FIO' },
-        { label: 'Количество дней на выплату вознаграждения', type: 'text', id: 'count_of_day' },
-        { label: 'Должность руководителя разработки', type: 'text', id: 'post_dir' },
-        { label: 'ФИО руководителя разработки', type: 'text', id: 'FIO_dir' },
-        { label: 'Дата служебного задания', type: 'date', id: 'date_task' },
-        { label: 'Требования к ПО', type: 'text', id: 'requirements' },
-        { label: 'Номер служебного задания', type: 'text', id: 'num_of_task' },
-        { label: 'Должность руководителя организации', type: 'text', id: 'post_boss' },
-        { label: 'ФИО руководителя организации', type: 'text', id: 'FIO_boss' },
-        { label: 'Документ, на основании которого действует руководитель', type: 'text', id: 'document' },
-    ],
-    'Распоряжение': [
-        { label: 'Название организации', type: 'text', id: 'name_of_organization' },
-        {label: 'Номер распоряжения', type: 'text', id: 'number_of_order' },
-        { label: 'Номер рекламной стратегии', type: 'text', id: 'num_of_task' },
-        { label: 'Дата рекламной стратегии', type: 'date', id: 'date_start' },
-        { label: 'Дата распоряжения', type: 'date', id: 'date' },
-        { label: 'Город', type: 'text', id: 'city' },
-        { label: 'ФИО маркетолога', type: 'text', id: 'FIO' },
-        { label: 'Дата завершения', type: 'date', id: 'date_task' },
-        { label: 'Должность отдавшего распоряжение', type: 'text', id: 'post_boss' },
-        { label: 'ФИО отдавшего распоряжение', type: 'text', id: 'FIO_boss' },
-    ]
-};
+fetch('fields.json')
+  .then(response => response.json())
+  .then(data => {
+    documentFields = data
+  })
+  .catch(error => {
+    console.error('Ошибка загрузки JSON:', error)
+  })
 
 function generateForm(documentType) {
     const form = document.getElementById('document-form');
@@ -264,6 +214,27 @@ function generateForm(documentType) {
     }
 }
 
+// Подключение файлов шаблонов
+import { prepareData as preparePurchaseData } from './templates/purchaseSale.js';
+import { prepareData as prepareOrderData } from './templates/developmentOrder.js';
+import { prepareData as prepareDirectiveData } from './templates/directive.js';
+
+const prepareFunctions = {
+    'Договор купли-продажи': {
+        prepare: preparePurchaseData,
+        endpoint: 'purchase&sale_agreement.docx'
+    },
+    'Приказ о начале разработки': {
+        prepare: prepareOrderData,
+        endpoint: 'order.docx'
+    },
+    'Распоряжение': {
+        prepare: prepareDirectiveData,
+        endpoint: 'rasporyajenie.docx'
+    }
+};
+
+
 document.querySelectorAll('.dropdown-item').forEach(item => {
     item.addEventListener('click', (event) => {
         selectedTemplate = event.target.textContent.trim();
@@ -271,913 +242,209 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     });
 });
 
-
+// Кнопка "Скачать docx"
 document.addEventListener("click", async (event) => {
-    // Проверяем, что нажата кнопка "Сохранить данные"
     if (event.target && event.target.textContent.trim() === 'Скачать документ .docx') {
-        event.preventDefault(); // Отключаем стандартное поведение кнопки
+        event.preventDefault();
 
-        // Собираем данные из формы
-        const form = event.target.closest("form"); // Находим текущую форму
+        const form = event.target.closest("form");
 
         const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
         if (!allFieldsFilled) {
-            alert("Пожалуйста, заполните все поля формы.");
+            alert("Пожалуйста, заполните все поля формы");
             return;
         }
 
         const formData = {};
-
-        // Проходимся по всем элементам формы и собираем данные
         form.querySelectorAll("input").forEach(input => {
-            formData[input.id] = input.value.trim(); // Используем id как ключи для данных
+            formData[input.id] = input.value.trim();
         });
 
-        if (formData.FIO_boss) {
-            const fio = formData.FIO;
-            if (!fio || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.FIO_boss) {
-            const fio_boss = formData.FIO_boss;
-            if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.FIO_dir) {
-            const fio_dir = formData.FIO_dir;
-            if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.name_of_seller) {
-            const fio_seller = formData.name_of_seller;
-            if (!fio_seller || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_seller)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.name_of_buyer) {
-            const fio_buyer = formData.name_of_buyer;
-            if (!fio_buyer || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_buyer)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+        // Валидация ФИО
+        const fioFields = ['FIO', 'FIO_boss', 'FIO_dir', 'name_of_seller', 'name_of_buyer'];
+        for (const field of fioFields) {
+            if (formData[field] && !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(formData[field])) {
+                alert(`Пожалуйста, введите корректное ФИО в формате "Фамилия Имя Отчество" для поля ${field}`);
                 return;
             }
         }
 
-        if (selectedTemplate == 'Договор купли-продажи') {
-            // Сохраняем полное имя продавца
-            const fullName = formData.name_of_seller;
-
-            // Преобразуем имя продавца в формат "Фамилия И. О."
-            if (fullName) {
-                const sellerNameParts = fullName.split(' ');
-                if (sellerNameParts.length === 3) {
-                    // Если имя состоит из Фамилия Имя Отчество
-                    formData.name_of_seller_short = `${sellerNameParts[0]} ${sellerNameParts[1][0]}. ${sellerNameParts[2][0]}.`;
-                } else if (sellerNameParts.length === 2) {
-                    // Если имя состоит из Фамилия Имя
-                    formData.name_of_seller_short = `${sellerNameParts[0]} ${sellerNameParts[1][0]}.`;
-                }
-            }
-
-            // Здесь сохраняем полное имя отдельно, если нужно использовать позже
-            formData.full_name_of_seller = fullName;
-
-            // Сохраняем полное имя продавца
-            const fullName_b = formData.name_of_buyer;
-
-            // Преобразуем имя продавца в формат "Фамилия И. О."
-            if (fullName_b) {
-                const buyerNameParts = fullName_b.split(' ');
-                if (buyerNameParts.length === 3) {
-                    // Если имя состоит из Фамилия Имя Отчество
-                    formData.name_of_buyer_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
-                } else if (buyerNameParts.length === 2) {
-                    // Если имя состоит из Фамилия Имя
-                    formData.name_of_buyer_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
-                }
-            }
-
-            // Здесь сохраняем полное имя отдельно, если нужно использовать позже
-            formData.full_name_of_buyer = fullName_b;
-
-
-            if (formData.date) {
-                const [year, month, day] = formData.date.split("-");
-                formData.day = day;
-                formData.month = month;
-                formData.year = year;
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-
-            try {
-                // Отправляем POST-запрос
-                const response = await fetch(`${BASE_URL}/generate_d/purchase&sale_agreement.docx`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-
-                // Проверяем ответ сервера
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
-                }
-
-                // Получаем сгенерированный файл
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'generated_document.docx'; // Название сохраняемого файла
-                a.click();
-
-                // Очищаем временный URL
-                setTimeout(() => URL.revokeObjectURL(url), 100);
-            } catch (error) {
-                console.error("Ошибка генерации документа:", error.message);
-                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
-            }
-        } else if(selectedTemplate == 'Приказ о начале разработки'){
-            if (formData.date) {
-                const [year, month, day] = formData.date.split("-");
-                formData.day = day;
-                formData.month = month;
-                formData.year = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date_of_TD) {
-                const [year, month, day] = formData.date_of_TD.split("-");
-                formData.day_of_TD = day;
-                formData.month_of_TD = month;
-                formData.year_of_TD = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.term_date) {
-                const [year, month, day] = formData.term_date.split("-");
-                formData.term_day = day;
-                formData.term_month = month;
-                formData.term_year = year;
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date_task) {
-                const [year, month, day] = formData.date_task.split("-");
-                formData.day_task = day;
-                formData.month_task = month;
-                formData.year_task = year;
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            const fullName_b = formData.FIO;
-            if (fullName_b) {
-                const buyerNameParts = fullName_b.split(' ');
-                if (buyerNameParts.length === 3) {
-                    // Если имя состоит из Фамилия Имя Отчество
-                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
-                } else if (buyerNameParts.length === 2) {
-                    // Если имя состоит из Фамилия Имя
-                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
-                }
-            }
-            formData.FIO = fullName_b;
-            const fullName_a = formData.FIO_dir;
-            if (fullName_b) {
-                const buyerNameParts = fullName_b.split(' ');
-                if (buyerNameParts.length === 3) {
-                    // Если имя состоит из Фамилия Имя Отчество
-                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
-                } else if (buyerNameParts.length === 2) {
-                    // Если имя состоит из Фамилия Имя
-                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
-                }
-            }
-            formData.FIO_dir = fullName_a;
-            try {
-                // Отправляем POST-запрос
-                const response = await fetch(`${BASE_URL}/generate_d/order.docx`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-
-                // Проверяем ответ сервера
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
-                }
-
-                // Получаем сгенерированный файл
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'generated_document.docx'; // Название сохраняемого файла
-                a.click();
-
-                // Очищаем временный URL
-                setTimeout(() => URL.revokeObjectURL(url), 100);
-            } catch (error) {
-                console.error("Ошибка генерации документа:", error.message);
-                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
-            }
-        }
-        
-        else if(selectedTemplate == 'Распоряжение'){
-
-            if (formData.date_task) {
-                const [year, month, day] = formData.date_task.split("-");
-                formData.day_task = day;
-                formData.month_task = month;
-                formData.year_task = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date_start) {
-                const [year, month, day] = formData.date_start.split("-");
-                formData.day_strat = day;
-                formData.month_strat = month;
-                formData.year_strat = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date) {
-                const [year, month, day] = formData.date.split("-");
-                formData.day = day;
-                formData.month = month;
-                formData.year = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            
-            try {
-                // Отправляем POST-запрос
-                const response = await fetch(`${BASE_URL}/generate_d/rasporyajenie.docx`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-
-                // Проверяем ответ сервера
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
-                }
-
-                // Получаем сгенерированный файл
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'generated_document.docx'; // Название сохраняемого файла
-                a.click();
-
-                // Очищаем временный URL
-                setTimeout(() => URL.revokeObjectURL(url), 100);
-            } catch (error) {
-                console.error("Ошибка генерации документа:", error.message);
-                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
-            }
-        }
-        
-    }
-});
-
-
-
-document.addEventListener("click", async (event) => {
-    // Проверяем, что нажата кнопка "Сохранить данные"
-    if (event.target && event.target.textContent.trim() === 'Скачать документ .pdf') {
-        event.preventDefault(); // Отключаем стандартное поведение кнопки
-
-        // Собираем данные из формы
-        const form = event.target.closest("form"); // Находим текущую форму
-
-        const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
-        if (!allFieldsFilled) {
-            alert("Пожалуйста, заполните все поля формы.");
+        const templateConfig = prepareFunctions[selectedTemplate];
+        if (!templateConfig) {
+            alert("Шаблон не поддерживается");
             return;
         }
 
-        const formData = {};
-
-        // Проходимся по всем элементам формы и собираем данные
-        form.querySelectorAll("input").forEach(input => {
-            formData[input.id] = input.value.trim(); // Используем id как ключи для данных
-        });
-
-        if (formData.FIO_boss) {
-            const fio = formData.FIO;
-            if (!fio || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.FIO_boss) {
-            const fio_boss = formData.FIO_boss;
-            if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.FIO_dir) {
-            const fio_dir = formData.FIO_dir;
-            if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.name_of_seller) {
-            const fio_seller = formData.name_of_seller;
-            if (!fio_seller || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_seller)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.name_of_buyer) {
-            const fio_buyer = formData.name_of_buyer;
-            if (!fio_buyer || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_buyer)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-
-        if (selectedTemplate == 'Договор купли-продажи') {
-            // Сохраняем полное имя продавца
-        const fullName = formData.name_of_seller;
-
-        // Преобразуем имя продавца в формат "Фамилия И. О."
-        if (fullName) {
-            const sellerNameParts = fullName.split(' ');
-            if (sellerNameParts.length === 3) {
-                // Если имя состоит из Фамилия Имя Отчество
-                formData.name_of_seller_short = `${sellerNameParts[0]} ${sellerNameParts[1][0]}. ${sellerNameParts[2][0]}.`;
-            } else if (sellerNameParts.length === 2) {
-                // Если имя состоит из Фамилия Имя
-                formData.name_of_seller_short = `${sellerNameParts[0]} ${sellerNameParts[1][0]}.`;
-            }
-        }
-
-        // Здесь сохраняем полное имя отдельно, если нужно использовать позже
-        formData.full_name_of_seller = fullName;
-
-        // Сохраняем полное имя продавца
-        const fullName_b = formData.name_of_buyer;
-
-        // Преобразуем имя продавца в формат "Фамилия И. О."
-        if (fullName_b) {
-            const buyerNameParts = fullName_b.split(' ');
-            if (buyerNameParts.length === 3) {
-                // Если имя состоит из Фамилия Имя Отчество
-                formData.name_of_buyer_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
-            } else if (buyerNameParts.length === 2) {
-                // Если имя состоит из Фамилия Имя
-                formData.name_of_buyer_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
-            }
-        }
-
-        // Здесь сохраняем полное имя отдельно, если нужно использовать позже
-        formData.full_name_of_buyer = fullName_b;
-
-
-        if (formData.date) {
-            const [year, month, day] = formData.date.split("-");
-            formData.day = day;
-            formData.month = month;
-            formData.year = year;
-        } else {
-            alert("Пожалуйста, заполните поле даты.");
-            return;
-        }
         try {
-            // Отправляем POST-запрос
-            const response = await fetch(`${BASE_URL}/generate_p/purchase%26sale_agreement.docx`, {
+            const preparedData = templateConfig.prepare(formData); // тут может быть синхрон или промис
+            const dataToSend = preparedData instanceof Promise ? await preparedData : preparedData;
+
+            const response = await fetch(`${BASE_URL}/generate_d/${templateConfig.endpoint}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToSend),
             });
 
-            // Проверяем ответ сервера
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
             }
 
-            // Получаем сгенерированный файл
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'generated_document.pdf'; // Название сохраняемого файла
+            a.download = 'generated_document.docx';
             a.click();
-
-            // Очищаем временный URL
             setTimeout(() => URL.revokeObjectURL(url), 100);
         } catch (error) {
             console.error("Ошибка генерации документа:", error.message);
-            alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
+            alert("Произошла ошибка при генерации документа. Проверь консоль");
         }
-        } else if(selectedTemplate == 'Приказ о начале разработки'){
-            if (formData.date) {
-                const [year, month, day] = formData.date.split("-");
-                formData.day = day;
-                formData.month = month;
-                formData.year = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date_of_TD) {
-                const [year, month, day] = formData.date_of_TD.split("-");
-                formData.day_of_TD = day;
-                formData.month_of_TD = month;
-                formData.year_of_TD = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.term_date) {
-                const [year, month, day] = formData.term_date.split("-");
-                formData.term_day = day;
-                formData.term_month = month;
-                formData.term_year = year;
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date_task) {
-                const [year, month, day] = formData.date_task.split("-");
-                formData.day_task = day;
-                formData.month_task = month;
-                formData.year_task = year;
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            const fullName_b = formData.FIO;
-            if (fullName_b) {
-                const buyerNameParts = fullName_b.split(' ');
-                if (buyerNameParts.length === 3) {
-                    // Если имя состоит из Фамилия Имя Отчество
-                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
-                } else if (buyerNameParts.length === 2) {
-                    // Если имя состоит из Фамилия Имя
-                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
-                }
-            }
-            formData.FIO = fullName_b;
-            const fullName_a = formData.FIO_dir;
-            if (fullName_b) {
-                const buyerNameParts = fullName_b.split(' ');
-                if (buyerNameParts.length === 3) {
-                    // Если имя состоит из Фамилия Имя Отчество
-                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
-                } else if (buyerNameParts.length === 2) {
-                    // Если имя состоит из Фамилия Имя
-                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
-                }
-            }
-            formData.FIO_dir = fullName_a;
-            try {
-                // Отправляем POST-запрос
-                const response = await fetch(`${BASE_URL}/generate_p/order.docx`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-    
-                // Проверяем ответ сервера
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
-                }
-    
-                // Получаем сгенерированный файл
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'generated_document.pdf'; // Название сохраняемого файла
-                a.click();
-    
-                // Очищаем временный URL
-                setTimeout(() => URL.revokeObjectURL(url), 100);
-            } catch (error) {
-                console.error("Ошибка генерации документа:", error.message);
-                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
-            }
-        }else if(selectedTemplate == 'Распоряжение'){
-            if (formData.date_task) {
-                const [year, month, day] = formData.date_task.split("-");
-                formData.day_task = day;
-                formData.month_task = month;
-                formData.year_task = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date_start) {
-                const [year, month, day] = formData.date_start.split("-");
-                formData.day_strat = day;
-                formData.month_strat = month;
-                formData.year_strat = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date) {
-                const [year, month, day] = formData.date.split("-");
-                formData.day = day;
-                formData.month = month;
-                formData.year = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            
-            try {
-                // Отправляем POST-запрос
-                const response = await fetch(`${BASE_URL}/generate_p/rasporyajenie.docx`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-
-                // Проверяем ответ сервера
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
-                }
-
-                // Получаем сгенерированный файл
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'generated_document.pdf'; // Название сохраняемого файла
-                a.click();
-
-                // Очищаем временный URL
-                setTimeout(() => URL.revokeObjectURL(url), 100);
-            } catch (error) {
-                console.error("Ошибка генерации документа:", error.message);
-                alert("Произошла ошибка при генерации документа. Проверьте консоль для деталей.");
-            }
-        }
-        
-        
     }
 });
 
-// -------------------------------------------- Предпросмотр пдф
+// Кнопка "Скачать pdf"
+document.addEventListener("click", async (event) => {
+    if (event.target && event.target.textContent.trim() === 'Скачать документ .pdf') {
+        event.preventDefault();
 
+        const form = event.target.closest("form");
 
-// Добавляем обработчик для кнопки "Создать документ"
+        const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
+        if (!allFieldsFilled) {
+            alert("Пожалуйста, заполните все поля формы");
+            return;
+        }
+
+        const formData = {};
+        form.querySelectorAll("input").forEach(input => {
+            formData[input.id] = input.value.trim();
+        });
+
+        // Валидация ФИО
+        const fioFields = ['FIO', 'FIO_boss', 'FIO_dir', 'name_of_seller', 'name_of_buyer'];
+        for (const field of fioFields) {
+            if (formData[field] && !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(formData[field])) {
+                alert(`Пожалуйста, введите корректное ФИО в формате "Фамилия Имя Отчество" для поля ${field}`);
+                return;
+            }
+        }
+
+        const templateConfig = prepareFunctions[selectedTemplate];
+        if (!templateConfig) {
+            alert("Шаблон не поддерживается");
+            return;
+        }
+
+        try {
+            const preparedData = templateConfig.prepare(formData); // тут может быть синхрон или промис
+            const dataToSend = preparedData instanceof Promise ? await preparedData : preparedData;
+
+            const response = await fetch(`${BASE_URL}/generate_p/${templateConfig.endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToSend),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'generated_document.pdf';
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        } catch (error) {
+            console.error("Ошибка генерации документа:", error.message);
+            alert("Произошла ошибка при генерации документа. Проверь консоль");
+        }
+    }
+});
+
+// Предпросмотр документа
 document.addEventListener("click", async (event) => {
     if (event.target && event.target.textContent.trim() === 'Создать документ') {
         event.preventDefault();
 
-        // Собираем данные из формы
         const form = event.target.closest("form");
         const button = event.target;
-        
+
         // Показываем лоадер
         button.disabled = true;
         button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Генерация...';
 
         const allFieldsFilled = Array.from(form.querySelectorAll("input")).every(input => input.value.trim() !== "");
         if (!allFieldsFilled) {
-            alert("Пожалуйста, заполните все поля формы.");
+            alert("Пожалуйста, заполните все поля формы");
             return;
         }
 
         const formData = {};
-
         form.querySelectorAll("input").forEach(input => {
             formData[input.id] = input.value.trim();
         });
 
-
-        if (formData.FIO_boss) {
-            const fio = formData.FIO;
-            if (!fio || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.FIO_boss) {
-            const fio_boss = formData.FIO_boss;
-            if (!fio_boss || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_boss)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.FIO_dir) {
-            const fio_dir = formData.FIO_dir;
-            if (!fio_dir || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_dir)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.name_of_seller) {
-            const fio_seller = formData.name_of_seller;
-            if (!fio_seller || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_seller)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
-                return;
-            }
-        }
-        if (formData.name_of_buyer) {
-            const fio_buyer = formData.name_of_buyer;
-            if (!fio_buyer || !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(fio_buyer)) {
-                alert("Пожалуйста, введите корректное ФИО в формате 'Фамилия Имя Отчество'.");
+        // Валидация ФИО
+        const fioFields = ['FIO', 'FIO_boss', 'FIO_dir', 'name_of_seller', 'name_of_buyer'];
+        for (const field of fioFields) {
+            if (formData[field] && !/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/.test(formData[field])) {
+                alert(`Пожалуйста, введите корректное ФИО в формате "Фамилия Имя Отчество" для поля ${field}`);
                 return;
             }
         }
 
+        const templateConfig = prepareFunctions[selectedTemplate];
+        if (!templateConfig) {
+            alert("Шаблон не поддерживается");
+            return;
+        }
 
-        if (selectedTemplate == 'Договор купли-продажи') {
-            // Сохраняем полное имя продавца
-            const fullName = formData.name_of_seller;
+        try {
+            const preparedData = templateConfig.prepare(formData); // тут может быть синхрон или промис
+            const dataToSend = preparedData instanceof Promise ? await preparedData : preparedData;
 
-            // Преобразуем имя продавца в формат "Фамилия И. О."
-            if (fullName) {
-                const sellerNameParts = fullName.split(' ');
-                if (sellerNameParts.length === 3) {
-                    // Если имя состоит из Фамилия Имя Отчество
-                    formData.name_of_seller_short = `${sellerNameParts[0]} ${sellerNameParts[1][0]}. ${sellerNameParts[2][0]}.`;
-                } else if (sellerNameParts.length === 2) {
-                    // Если имя состоит из Фамилия Имя
-                    formData.name_of_seller_short = `${sellerNameParts[0]} ${sellerNameParts[1][0]}.`;
-                }
-            }
+            const response = await fetch(`${BASE_URL}/generate_p/${templateConfig.endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToSend),
+            });
 
-            // Здесь сохраняем полное имя отдельно, если нужно использовать позже
-            formData.full_name_of_seller = fullName;
-
-            // Сохраняем полное имя продавца
-            const fullName_b = formData.name_of_buyer;
-
-            // Преобразуем имя продавца в формат "Фамилия И. О."
-            if (fullName_b) {
-                const buyerNameParts = fullName_b.split(' ');
-                if (buyerNameParts.length === 3) {
-                    // Если имя состоит из Фамилия Имя Отчество
-                    formData.name_of_buyer_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
-                } else if (buyerNameParts.length === 2) {
-                    // Если имя состоит из Фамилия Имя
-                    formData.name_of_buyer_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
-                }
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
             }
 
-            // Здесь сохраняем полное имя отдельно, если нужно использовать позже
-            formData.full_name_of_buyer = fullName_b;
+            const blob = await response.blob();
+            const pdfUrl = window.URL.createObjectURL(blob);
 
+            // Отображаем PDF в контейнере для предпросмотра
+            const previewSector = document.getElementById('preview-container');
+            previewSector.innerHTML = ''; // Очищаем контейнер
 
-            if (formData.date) {
-                const [year, month, day] = formData.date.split("-");
-                formData.day = day;
-                formData.month = month;
-                formData.year = year;
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }  
-            try {
-                // Отправляем POST-запрос на сервер для генерации PDF
-                const response = await fetch(`${BASE_URL}/generate_p/purchase%26sale_agreement.docx`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
+            const pdfIframe = document.createElement('iframe');
+            pdfIframe.src = pdfUrl;
+            pdfIframe.width = '100%';
+            pdfIframe.height = '600px';
+            pdfIframe.style.border = 'none';
+
+            previewSector.appendChild(pdfIframe);
     
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
-                }
-    
-                // Получаем PDF как Blob
-                const blob = await response.blob();
-    
-                // Создаём объект URL для отображения PDF
-                const pdfUrl = URL.createObjectURL(blob);
-    
-                // Отображаем PDF в контейнере для предпросмотра
-                const previewSector = document.getElementById('preview-container');
-                previewSector.innerHTML = ''; // Очищаем контейнер
-    
-                const pdfIframe = document.createElement('iframe');
-                pdfIframe.src = pdfUrl;
-                pdfIframe.width = '100%';
-                pdfIframe.height = '600px';
-                pdfIframe.style.border = 'none';
-    
-                previewSector.appendChild(pdfIframe);
-    
-            } catch (error) {
-                console.error("Ошибка генерации документа:", error.message);
-                alert("Произошла ошибка при генерации документа.");
-            } finally {
-                // Восстанавливаем кнопку
-                button.disabled = false;
-                button.textContent = 'Создать документ';
-            }
-        }else if(selectedTemplate == 'Приказ о начале разработки'){
-            if (formData.date) {
-                const [year, month, day] = formData.date.split("-");
-                formData.day = day;
-                formData.month = month;
-                formData.year = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date_of_TD) {
-                const [year, month, day] = formData.date.split("-");
-                formData.day_of_TD = day;
-                formData.month_of_TD = month;
-                formData.year_of_TD = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.term_date) {
-                const [year, month, day] = formData.date.split("-");
-                formData.term_day = day;
-                formData.term_month = month;
-                formData.term_year = year;
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date_task) {
-                const [year, month, day] = formData.date.split("-");
-                formData.day_task = day;
-                formData.month_task = month;
-                formData.year_task = year;
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            const fullName_b = formData.FIO;
-            if (fullName_b) {
-                const buyerNameParts = fullName_b.split(' ');
-                if (buyerNameParts.length === 3) {
-                    // Если имя состоит из Фамилия Имя Отчество
-                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
-                } else if (buyerNameParts.length === 2) {
-                    // Если имя состоит из Фамилия Имя
-                    formData.FIO_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
-                }
-            }
-            formData.FIO = fullName_b;
-            const fullName_a = formData.FIO_dir;
-            if (fullName_b) {
-                const buyerNameParts = fullName_a.split(' ');
-                if (buyerNameParts.length === 3) {
-                    // Если имя состоит из Фамилия Имя Отчество
-                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}. ${buyerNameParts[2][0]}.`;
-                } else if (buyerNameParts.length === 2) {
-                    // Если имя состоит из Фамилия Имя
-                    formData.FIO_dir_short = `${buyerNameParts[0]} ${buyerNameParts[1][0]}.`;
-                }
-            }
-            formData.FIO_dir = fullName_a;
-            try {
-                // Отправляем POST-запрос на сервер для генерации PDF
-                const response = await fetch(`${BASE_URL}/generate_p/order.docx`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-    
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
-                }
-    
-                // Получаем PDF как Blob
-                const blob = await response.blob();
-    
-                // Создаём объект URL для отображения PDF
-                const pdfUrl = URL.createObjectURL(blob);
-    
-                // Отображаем PDF в контейнере для предпросмотра
-                const previewSector = document.getElementById('preview-container');
-                previewSector.innerHTML = ''; // Очищаем контейнер
-    
-                const pdfIframe = document.createElement('iframe');
-                pdfIframe.src = pdfUrl;
-                pdfIframe.width = '100%';
-                pdfIframe.height = '600px';
-                pdfIframe.style.border = 'none';
-    
-                previewSector.appendChild(pdfIframe);
-    
-            } catch (error) {
-                console.error("Ошибка генерации документа:", error.message);
-                alert("Произошла ошибка при генерации документа.");
-            }
-        }else if(selectedTemplate == 'Распоряжение'){
-            if (formData.date_task) {
-                const [year, month, day] = formData.date_task.split("-");
-                formData.day_task = day;
-                formData.month_task = month;
-                formData.year_task = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date_start) {
-                const [year, month, day] = formData.date_start.split("-");
-                formData.day_strat = day;
-                formData.month_strat = month;
-                formData.year_strat = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            if (formData.date) {
-                const [year, month, day] = formData.date.split("-");
-                formData.day = day;
-                formData.month = month;
-                formData.year = year.slice(-1);
-            } else {
-                alert("Пожалуйста, заполните поле даты.");
-                return;
-            }
-            try {
-                // Отправляем POST-запрос на сервер для генерации PDF
-                const response = await fetch(`${BASE_URL}/generate_p/rasporyajenie.docx`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-    
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
-                }
-    
-                // Получаем PDF как Blob
-                const blob = await response.blob();
-    
-                // Создаём объект URL для отображения PDF
-                const pdfUrl = URL.createObjectURL(blob);
-    
-                // Отображаем PDF в контейнере для предпросмотра
-                const previewSector = document.getElementById('preview-container');
-                previewSector.innerHTML = ''; // Очищаем контейнер
-    
-                const pdfIframe = document.createElement('iframe');
-                pdfIframe.src = pdfUrl;
-                pdfIframe.width = '100%';
-                pdfIframe.height = '600px';
-                pdfIframe.style.border = 'none';
-    
-                previewSector.appendChild(pdfIframe);
-    
-            } catch (error) {
-                console.error("Ошибка генерации документа:", error.message);
-                alert("Произошла ошибка при генерации документа.");
-            }
+        } catch (error) {
+            console.error("Ошибка генерации документа:", error.message);
+            alert("Произошла ошибка при генерации документа. Проверь консоль");
+        }
+        finally {
+            // Восстанавливаем кнопку
+            button.disabled = false;
+            button.textContent = 'Создать документ';
         }
     }
 });
-
 
 
 // Добавим глобальные переменные
