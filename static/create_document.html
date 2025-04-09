@@ -3,35 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Шапка сайта</title>
+  <link rel="icon" href="logo-transparent.png" type="image/png">
+  <title>UPLAWYER</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.document.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:wght@500&display=swap" rel="stylesheet">
-  
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+
   </head>
 <body>
     <!-- Шапка -->
     <div class="top-header bg-white">
-        <div class="container d-flex align-items-center">
-            <!-- Логотип -->
-            <a href="create_document.html" class="logoHref">
-                <img src="logo.png" class="logo-image" alt="Логотип">
-            </a>
-
-            <!-- Кнопка "Создать документ" -->
-            <a href="create_document.html">СОЗДАТЬ ДОКУМЕНТ</a>
-      
-            <!-- Кнопки справа -->
-            <div class="authorize ms-auto">
-                <a href="#" class="logoHref">
-                    <img src="authorize.png" class="logo-image" alt="Логотип">
-                </a>
+      <div class="container d-flex align-items-center">
+        <!-- Логотип -->
+        <a href="create_document.html" class="logoHref">
+          <img src="logo-transparent.png" class="logo-image" alt="Логотип">
+        </a>
+    
+        <!-- Основные ссылки -->
+        <a href="#" class="nav-link ms-4" id="createDocLink">СОЗДАТЬ ДОКУМЕНТ</a>
+        <button class="nav-link ms-4 border-0 bg-transparent d-none" id="historyBtn" style="font-weight: 700;">ИСТОРИЯ</button>
+    
+        <!-- Блок авторизации -->
+        <div class="authorize ms-auto">
+          <div id="authBlock">
+            <!-- Гость -->
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#authModal" id="loginBtn">
+              Войти
+            </button>
+            
+            <!-- Авторизованный пользователь -->
+            <div class="d-none align-items-center" id="userBlock">
+              <span class="me-3" id="usernameDisplay"></span>
+              <button class="btn btn-outline-danger btn-sm" id="logoutBtn">Выйти</button>
             </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Добавить в body -->
+<div class="modal fade" id="authModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Вход / Регистрация</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs" id="authTabs">
+          <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#login">Вход</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#register">Регистрация</a>
+          </li>
+        </ul>
+        
+        <div class="tab-content mt-3">
+          <div id="login" class="tab-pane fade show active">
+            <form id="loginForm">
+              <div class="mb-3">
+                  <input type="text" 
+                         name="username" 
+                         class="form-control" 
+                         placeholder="Логин" 
+                         required>
+              </div>
+              <div class="mb-3">
+                  <input type="password" 
+                         name="password" 
+                         class="form-control" 
+                         placeholder="Пароль" 
+                         required>
+              </div>
+              <button type="submit" class="btn btn-primary">Войти</button>
+          </form>
+          </div>
+          
+          <div id="register" class="tab-pane fade">
+            <form id="registerForm">
+              <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Логин" required>
+              </div>
+              <div class="mb-3">
+                <input type="email" class="form-control" placeholder="Email" required>
+              </div>
+              <div class="mb-3">
+                <input type="password" class="form-control" placeholder="Пароль" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="modal fade" id="historyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">История документов</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                              <th style="width: 25%">Имя</th>
+                              <th style="width: 25%">Тип</th>
+                              <th style="width: 25%">Дата создания</th>
+                              <th style="width: 25%">Тип файла</th>
+                              <th style="width: 25%">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- История будет загружена здесь -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
     <div id="qwerty">
       <div class="container my-5 text-center">
@@ -137,8 +241,33 @@
       
     </div>
 
+
+    <div class="chat-icon" id="chatIcon"></div>
+ 
+    <!-- Окно чата (по умолчанию скрыто) -->
+    <div class="chat-window" id="chatWindow" style="display: none;">
+      <div class="chat-header">
+        <span>Чат поддержки</span>
+        <button id="closeChat">X</button>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-message bot">Привет! Я ИИ-бот, который может ответить на любой юридический вопрос. Чем могу помочь?</div>
+    </div>
+          <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Напишите сообщение..." />
+        <button id="sendChat">Отправить</button>
+      </div>
+    </div>
+  
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src ="scripts.js" defer></script>
+  <script type="module" src ="scripts.js" defer></script>
   <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="/static/templates/chat.js"></script>
+
+
 </body>
 </html>
