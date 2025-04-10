@@ -74,6 +74,8 @@ function handleDocumentSelection(event) {
     if (event.target.classList.contains('dropdown-item')) {
         event.preventDefault(); // Останавливаем стандартное действие (переход по ссылке)
 
+        document.getElementById('createDocLink').classList.remove('d-none')
+
         // Получаем значение атрибута data-type (если оно есть) или определяем тип по тексту
         const type = event.target.getAttribute('data-type') || event.target.textContent.trim();
 
